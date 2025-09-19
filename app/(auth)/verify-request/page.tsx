@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react"
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 export default function VerifyRequest(){
     const router = useRouter();
     const[otp, setOtp]= useState("");
@@ -60,7 +61,18 @@ export default function VerifyRequest(){
                     </InputOTP>
                     <p className="text-xs text-muted-foreground mt-2"> Enter the 6-digit code sent to your email</p>
                 </div>
-                <Button onClick={verifyOtp} disabled={emailPending || !isOtpCompleted} className="w-full">Verify Account</Button>
+                <Button onClick={verifyOtp} disabled={emailPending || !isOtpCompleted} className="w-full">Verify Account
+                    { emailPending ? (
+                        <>
+                        <Loader2 className="size-4 animate-spin"/>
+                        <span>Loading..</span>
+                        </>
+                    ) : (
+                        "Verify Account"
+                    )
+
+                    }
+                </Button>
             </CardContent>
 
         </Card>
