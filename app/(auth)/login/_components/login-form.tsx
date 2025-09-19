@@ -43,7 +43,7 @@ export function LoginForm() {
               fetchOptions:{
                 onSuccess: () =>{
                     toast.success('Verification OTP sent successfully! You will be redirected..');
-                    router.push(`/verify-request`);
+                    router.push(`/verify-request?email=${email}`);
                 },
                 onError:(error) =>{
                     toast.error(error.error.message);
