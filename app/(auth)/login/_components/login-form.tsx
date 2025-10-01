@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 
 export function LoginForm() {
     const router= useRouter();
+    const session = authClient.useSession();
     const[googlePending, startGoogleTransition] = useTransition();
     const[emailPending, startEmailTransition] = useTransition();
     const [email, setEmail] = useState("");
@@ -23,8 +24,7 @@ export function LoginForm() {
                 
                 fetchOptions:{
                     onSuccess: () =>{
-                        toast.success('Signed in successfully! You will be redirected..');
-                        
+                        toast.success('Signing you in.. You will be redirected..');
                     },
                     onError:(error) =>{
                         toast.error(error.error.message);
@@ -44,6 +44,7 @@ export function LoginForm() {
                 onSuccess: () =>{
                     toast.success('Verification OTP sent successfully! You will be redirected..');
                     router.push(`/verify-request?email=${email}`);
+                
                 },
                 onError:(error) =>{
                     toast.error(error.error.message);
