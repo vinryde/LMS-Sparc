@@ -1,6 +1,6 @@
 "use client"
 import Link from 'next/link';
-import { ArrowLeft, PlusIcon, SparkleIcon } from 'lucide-react';
+import { ArrowLeft, Loader2, PlusIcon, SparkleIcon } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useForm } from 'react-hook-form';
@@ -13,7 +13,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RichTextEditor } from '@/components/rich-text-editor/Editor';
 import { Uploader } from '@/components/file-uploader/Uploader';
+import { tryCatch } from '@/hooks/try-catch';
+import { useTransition } from 'react';
+import { CreateCourse } from './actions';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 export default function CourseCreationPage(){
+    const[isPending,startTransition]=useTransition();
+    const router = useRouter();
+
     const form = useForm<CourseSchemaType>({
     resolver: zodResolver(courseSchema),
     defaultValues: {
@@ -31,9 +39,21 @@ export default function CourseCreationPage(){
   });
 
     function onSubmit(values: CourseSchemaType) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+    startTransition(async()=>{
+      const{data:result,error}= await tryCatch(CreateCourse(values));
+      if(error){
+        toast.error("An unexpected error occurred. Please try again.");
+        return;
+      }
+      if(result.status=== 'success'){
+        toast.success(result.message);
+        form.reset();
+        router.push('/admin/courses');
+      }
+      else if(result.status === 'error'){
+        toast.error(result.message);
+      }
+    })
   }
     return(
      <>
@@ -109,7 +129,7 @@ export default function CourseCreationPage(){
                     <FormItem className='w-full'>
                         <FormLabel>Thumbnail Image</FormLabel>
                         <FormControl>
-                            <Uploader/>
+                            <Uploader value={field.value} onChange={field.onChange} />
                         </FormControl>
                         <FormMessage/>
                         </FormItem>
@@ -195,8 +215,17 @@ export default function CourseCreationPage(){
                         <FormMessage/>
                         </FormItem>
                 )}/>
-                <Button className='flex gap-1 items-end'>
+                <Button className='flex gap-1 items-end' disabled={isPending}>
+                 {isPending?(
+                  <>
+                  Creating...
+                  <Loader2 className='animate-spin ml-1' />
+                  </>
+                 ): ( 
+                  <>
                   Create Course <PlusIcon className='ml-2' size={18}/>
+                  </>
+                  )}
                 </Button>
 
             </form>
