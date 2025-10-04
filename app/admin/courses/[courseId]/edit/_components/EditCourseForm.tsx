@@ -59,6 +59,7 @@ export function EditCourseForm({data}: iAppProps) {
     })
   }
     return (
+          <section className=''>
           <Form {...form}  >
             <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
                 <FormField control={form.control} name="title" render={({ field }) => (
@@ -211,5 +212,6 @@ export function EditCourseForm({data}: iAppProps) {
 
             </form>
           </Form>
+          </section>
     )
 }
