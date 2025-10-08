@@ -1,9 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DndContext, rectIntersection, useSensor, useSensors, PointerSensor, KeyboardSensor, DraggableSyntheticListeners } from "@dnd-kit/core";
+import { DndContext, rectIntersection, useSensor, useSensors, PointerSensor, KeyboardSensor, DraggableSyntheticListeners, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, useSortable,sortableKeyboardCoordinates,arrayMove } from "@dnd-kit/sortable";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {CSS} from '@dnd-kit/utilities';
 import { AdminCourseSingularType } from "@/app/data/admin/admin-get-course";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChevronDown, ChevronRight, DeleteIcon, FileText, GripVertical, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { reorderChapter, reorderChapters, reorderLessons } from "../actions";
+import { error } from "console";
 
 interface iAppProps{
     data: AdminCourseSingularType;
@@ -39,6 +41,24 @@ const initialItems = data.chapter.map((chapter)=>({
 })) || [];
 const [items, setItems] = useState(initialItems);
 console.log(items);
+
+useEffect(()=>{
+  setItems((prevItems) => {
+    const updatedItems = data.chapter.map ((chapter) => ({
+       id: chapter.id,
+  title: chapter.title,
+  order: chapter.position,
+  isOpen: prevItems.find ((item) => item.id === chapter.id)?.isOpen ?? true,
+  lessons: chapter.lesson.map((lesson)=>({
+    id: lesson.id,
+    title: lesson.title,
+    order: lesson.position,
+  })),
+    })) || [];
+    return updatedItems;
+  });
+}, [data]);
+
 function SortableItem({id, children, className, data}: SortableItemProps) {
   const {
     attributes,
@@ -61,7 +81,7 @@ function SortableItem({id, children, className, data}: SortableItemProps) {
     </div>
   );
 }
-    function handleDragEnd(event) {
+    function handleDragEnd(event: DragEndEvent) {
     const {active, over} = event;
     
        if(!over || active.id === over.id){
@@ -102,6 +122,29 @@ function SortableItem({id, children, className, data}: SortableItemProps) {
       
     const previousItems=[...items]
     setItems(updatedChapterForState);
+
+    if(courseId) {
+      const chaptersToUpdate = updatedChapterForState.map((chapter) => ({
+        id: chapter.id,
+        position: chapter.order,
+      }));
+
+      const reorderPromise = () => reorderChapters(courseId, chaptersToUpdate);
+
+      toast.promise(reorderPromise(), {
+        loading:'Reordering chapters...',
+        success: (result) => {
+          if(result.status === 'success') return result.message;
+
+          throw new Error(result.message);
+        },
+        error: () => {
+          setItems(previousItems);
+          return "Failed to reorder chapters";
+        },
+      });
+    }
+    return;
        }
        if(activeType === 'lesson' && overType === 'lesson') {
          const chapterId = active.data.current?.chapterId;
@@ -145,7 +188,25 @@ newItems[chapterIndex]={
 
 const previousItems = [...items]
 setItems(newItems);
-      
+if(courseId){
+  const lessonsToUpdate= updatedLessonForState.map((lesson)=>({
+  id: lesson.id,
+  position: lesson.order
+  }));
+  const reorderLessonsPromise = () => reorderLessons(chapterId, lessonsToUpdate, courseId);
+  toast.promise(reorderLessonsPromise(),{
+    loading: 'Reordering Lessons...',
+    success: (result) => {
+       if(result.status === "success") return result.message;
+       throw new Error(result.message);
+    },
+    error: () => {
+      setItems(previousItems);
+      return 'Failed to reordered Lessons'
+    }
+  })
+}
+      return;
   }
 }
 function toggleChapter(chapterId: string){
@@ -165,7 +226,7 @@ function toggleChapter(chapterId: string){
                 <CardHeader className="flex flex-row items-center justify-between border-b border-border">
                     <CardTitle>Chapters</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-8">
                   <SortableContext items={items} strategy={verticalListSortingStrategy} >
                     {items.map((item)=>(
                       <SortableItem 
