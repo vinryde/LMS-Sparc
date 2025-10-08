@@ -11,8 +11,10 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChevronDown, ChevronRight, DeleteIcon, FileText, GripVertical, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { reorderChapter, reorderChapters, reorderLessons } from "../actions";
-import { error } from "console";
+import { reorderChapters, reorderLessons } from "../actions";
+import { NewChapterModel } from "./NewChapterModel";
+import { NewLessonModel } from "./NewLessonModel";
+import { DeleteLesson } from "./DeleteLesson";
 
 interface iAppProps{
     data: AdminCourseSingularType;
@@ -225,6 +227,7 @@ function toggleChapter(chapterId: string){
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between border-b border-border">
                     <CardTitle>Chapters</CardTitle>
+                    <NewChapterModel courseId={data.id}/>
                 </CardHeader>
                 <CardContent className="space-y-8">
                   <SortableContext items={items} strategy={verticalListSortingStrategy} >
@@ -268,16 +271,14 @@ function toggleChapter(chapterId: string){
              <FileText className="size-4"/>
              <Link href={`/admin/courses/${data.id}/${item.id}/${lesson.id}`}>{lesson.title}</Link>
             </div>
-            <Button variant="outline" size="icon"> <Trash2 className="size-4"/> </Button>
+            <DeleteLesson chapterId={item.id} lessonId={lesson.id} courseId={data.id}/>
           </div>
         )}
         </SortableItem>
        ))}
       </SortableContext>
       <div className="p-2">
-        <Button variant="outline" className="w-full">
-          Create New Lesson
-        </Button>
+        <NewLessonModel courseId={data.id} chapterId={item.id}/>
       </div>
     </div>
     </CollapsibleContent>
