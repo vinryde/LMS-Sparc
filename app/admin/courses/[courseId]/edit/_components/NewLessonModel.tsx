@@ -45,6 +45,10 @@ export function NewLessonModel({courseId,chapterId}: { courseId: string ,chapter
   }
 
     function handleOpenChange(open: boolean){
+
+       if(!open){
+        form.reset()
+       }
         setIsOpen(open);
     }
     return(
