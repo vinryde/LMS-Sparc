@@ -39,6 +39,7 @@ export const lessonSchema = z.object({
     description: z.string().min(10,{message:"Description must be at least 10 characters long"}).optional(),
     videoKey: z.string().optional(),
     thumbnailKey: z.string().optional(),   
+    documentKey: z.string().optional(),
 });
 export type CourseSchemaType = z.infer<typeof courseSchema>;
 export type ChapterSchemaType = z.infer<typeof chapterSchema>;
