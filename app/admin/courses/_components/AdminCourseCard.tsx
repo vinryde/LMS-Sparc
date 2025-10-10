@@ -17,7 +17,7 @@ interface iAppProps {
 
 export function AdminCourseCard({data}: iAppProps) {
     const ThumbnailUrl = useConstructUrl(data.fileKey);
-      const imageData= `https://create-lms.t3.storage.dev/${data.fileKey}`;
+      
     return(
       
         <Card className="group relative py-0 gap-0">
