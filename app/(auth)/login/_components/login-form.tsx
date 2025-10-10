@@ -27,7 +27,7 @@ export function LoginForm() {
                         toast.success('Signing you in.. You will be redirected..');
                     },
                     onError:(error) =>{
-                        toast.error(error.error.message);
+                        toast.error("error");
                     }
                 }
             });
@@ -47,7 +47,7 @@ export function LoginForm() {
                 
                 },
                 onError:(error) =>{
-                    toast.error(error.error.message);
+                    toast.error("Error");
                 }
               }
             })
