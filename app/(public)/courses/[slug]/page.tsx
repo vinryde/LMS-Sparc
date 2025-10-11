@@ -1,10 +1,10 @@
 import { getIndividualCourse } from "@/app/data/course/get-course";
 import { RenderDescriptionn } from "@/components/rich-text-editor/RenderDescription";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
-import { useConstructUrl } from "@/hooks/use-construct-url";
 import { IconBook, IconCategory, IconChartBar, IconChevronDown, IconClock, IconPlayerPlay } from "@tabler/icons-react";
 import { CheckIcon } from "lucide-react";
 import Image from "next/image";
@@ -250,6 +250,10 @@ export default async function SlugPage({params}: {params: Params}) {
 
                               </ul>
                             </div>
+                            <Button className="w-full">Enroll Now! </Button>
+                            <p className="mt-3 text-center text-xs text-muted-foreground">
+                                Enroll now and start learning.
+                            </p>
 
                         </CardContent>
 

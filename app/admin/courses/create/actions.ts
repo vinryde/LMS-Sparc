@@ -8,11 +8,6 @@ import arcjet, { detectBot, fixedWindow } from '@/lib/arcjet';
 import {request} from '@arcjet/next';
 
 const aj = arcjet.withRule(
-  detectBot({
-    mode: "LIVE",
-    allow:[],
-  })
-).withRule(
   fixedWindow({
     mode: "LIVE",
     window: "1m",
