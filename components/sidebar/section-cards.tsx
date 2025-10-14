@@ -1,119 +1,89 @@
 import {
-  IconTrendingUp,
-  IconTrendingDown,
-  IconUsers,
   IconBook,
-  IconBolt,
 } from "@tabler/icons-react"
-
-import { Badge } from "@/components/ui/badge"
 import {
   Card,
-  CardAction,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { BookCopy, GraduationCap, Vote } from "lucide-react"
+import { getDashboardStats } from "@/app/data/admin/admin-get-dashboard-stats";
 
-export function SectionCards() {
+export async function SectionCards() {
+  const{totalUsers,totalCourses,totalEnrollments,totalLessons}= await getDashboardStats();
   return (
-    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-      {/* Enrolled Students */}
+    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4  *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-2">
       <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Enrolled Students</CardDescription>
+        <CardHeader className="flex items-center justify-between space-y-0 pb-2">
+          <div>
+            <CardDescription>Total Students</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            245
+            {totalUsers}
           </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTrendingUp />
-              +8.2%
-            </Badge>
-          </CardAction>
+          </div>
+          <div className="size-12 bg-primary/20 rounded-full flex items-center justify-center">
+          <GraduationCap className="w-8 h-8 text-primary"/>
+          </div>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Growing student participation <IconTrendingUp className="size-4" />
-          </div>
-          <div className="text-muted-foreground">
-            Increase in enrollment
-          </div>
+          <p className="text-muted-foreground">Registered Students on Create</p>
         </CardFooter>
       </Card>
 
-      {/* Completed Modules */}
       <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Completed Modules</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            780
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTrendingUp />
-              +15%
-            </Badge>
-          </CardAction>
+        <CardHeader className="flex items-center justify-between space-y-0 pb-2">
+          <div>
+            <CardDescription>Total Enrolled Students</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {totalEnrollments}
+            </CardTitle>
+          </div>
+          <div className="size-12 bg-primary/20 rounded-full flex items-center justify-center">
+          <Vote className="w-8 h-8 text-primary"/>
+          </div>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Higher completion rates <IconBook className="size-4" />
-          </div>
-          <div className="text-muted-foreground">
-            More learners are finishing energy literacy courses
-          </div>
+          <p className="text-muted-foreground">Enrolled Students on Create</p>
         </CardFooter>
       </Card>
 
-      {/* Energy Awareness Projects */}
       <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Energy Projects</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            132
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTrendingUp />
-              +22%
-            </Badge>
-          </CardAction>
+        <CardHeader className="flex items-center justify-between space-y-0 pb-2">
+          <div>
+            <CardDescription>Total Courses</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {totalCourses}
+            </CardTitle>
+          </div>
+          <div className="size-12 bg-primary/20 rounded-full flex items-center justify-center">
+          <BookCopy className="w-8 h-8 text-primary"/>
+          </div>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Active student-led initiatives <IconBolt className="size-4" />
-          </div>
-          <div className="text-muted-foreground">
-            Sustainability actions expanding in schools
-          </div>
+          <p className="text-muted-foreground">Available Courses on Create</p>
         </CardFooter>
       </Card>
 
-      {/* Instructor Engagement */}
       <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Instructor Engagement</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            92%
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconTrendingDown />
-              -3%
-            </Badge>
-          </CardAction>
+        <CardHeader className="flex items-center justify-between space-y-0 pb-2">
+          <div>
+            <CardDescription>Total Lessons and Activities</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {totalLessons}
+            </CardTitle>
+          </div>
+          <div className="size-12 bg-primary/20 rounded-full flex items-center justify-center">
+          <IconBook className="w-8 h-8 text-primary"/>
+          </div>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Slight dip in activity <IconTrendingDown className="size-4" />
-          </div>
-          <div className="text-muted-foreground">
-            Encourage teachers to lead more discussions
-          </div>
+          <p className="text-muted-foreground">Available Lessons and Activities on Create</p>
         </CardFooter>
       </Card>
+
+    
     </div>
   )
 }

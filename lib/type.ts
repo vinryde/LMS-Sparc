@@ -1,4 +1,4 @@
 export type ApiResponse={
-    status: "success" | "error",
+    status: "success" | "error"|"enrolled",
     message: string,
 }
