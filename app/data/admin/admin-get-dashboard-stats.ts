@@ -21,4 +21,17 @@ export async function getDashboardStats(){
     totalEnrollments,
     totalLessons,
    }
+
+   /*prisma.user.count(
+        {
+            where:{
+                role: "Student",
+                enrollment:{
+                    some:{
+                        status: "Completed",
+                    }
+                }
+            }
+        }
+    )*/
 }

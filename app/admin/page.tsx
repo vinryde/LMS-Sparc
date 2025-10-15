@@ -40,7 +40,7 @@ async function RenderRecentCourses(){
   const data= await adminGetRecentCourses();
 
   if(data.length===0){
-    return(<EmptyState buttonText="Create a Course" description="No recent courses found. Create some to see them here " title="You don't have any recent courses" />)
+    return(<EmptyState buttonText="Create a Course" description="No recent courses found. Create some to see them here " title="You don't have any recent courses" href="/admin/courses/create" />)
   }
   return(
      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

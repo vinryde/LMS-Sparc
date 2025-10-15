@@ -35,7 +35,7 @@ export async function SectionCards() {
       <Card className="@container/card">
         <CardHeader className="flex items-center justify-between space-y-0 pb-2">
           <div>
-            <CardDescription>Total Enrolled Students</CardDescription>
+            <CardDescription>Total Enrollments </CardDescription>
             <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
               {totalEnrollments}
             </CardTitle>

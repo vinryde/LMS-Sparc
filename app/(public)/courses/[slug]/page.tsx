@@ -1,7 +1,6 @@
 import { getIndividualCourse } from "@/app/data/course/get-course";
 import { RenderDescriptionn } from "@/components/rich-text-editor/RenderDescription";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
@@ -9,12 +8,14 @@ import { IconBook, IconCategory, IconChartBar, IconChevronDown, IconClock, IconP
 import { CheckIcon } from "lucide-react";
 import Image from "next/image";
 import { EnrollButton } from "@/app/(public)/courses/_components/EnrollButton";
+import { checkIfUserEnrolled } from "@/app/data/user/user-is-enrolled";
 
 type Params = Promise<{ slug: string }>;
 
 export default async function SlugPage({params}: {params: Params}) {
     const{slug} = await params;
     const course = await getIndividualCourse(slug);
+    const enrolled = await checkIfUserEnrolled (course.id);
     
 
     return(
@@ -139,17 +140,7 @@ export default async function SlugPage({params}: {params: Params}) {
                     <Card className="py-0 ">
                         <CardContent className="p-6">
 
-                            <div className="flex items-center justify-between mb-6">
-                                <span className="text-lg font-medium">
-                                    Price:
-                                </span>
-                                <span className="text-2xl font-bold text-primary">
-                                    {new Intl.NumberFormat('en-US', {
-                                        style: 'currency',
-                                        currency: 'USD',
-                                    }).format(course.price)} 
-                                </span>
-                            </div>
+                            
                             <div className="space-y-3 mb-6 rounded-lg bg-muted p-4">
                                 <h4 className="font-mediumm">
                                     What you will get:
@@ -251,7 +242,7 @@ export default async function SlugPage({params}: {params: Params}) {
 
                               </ul>
                             </div>
-                            <EnrollButton courseId={course.id} />
+                            <EnrollButton courseId={course.id} enrolled={enrolled} />
                             <p className="mt-3 text-center text-xs text-muted-foreground">
                                 Enroll now and start learning.
                             </p>
@@ -266,3 +257,14 @@ export default async function SlugPage({params}: {params: Params}) {
         </div>
     );
 }
+/*<div className="flex items-center justify-between mb-6">
+                                <span className="text-lg font-medium">
+                                    Price:
+                                </span>
+                                <span className="text-2xl font-bold text-primary">
+                                    {new Intl.NumberFormat('en-US', {
+                                        style: 'currency',
+                                        currency: 'USD',
+                                    }).format(course.price)} 
+                                </span>
+                            </div>*/

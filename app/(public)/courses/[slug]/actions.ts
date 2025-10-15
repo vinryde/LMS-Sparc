@@ -41,6 +41,7 @@ export async function enrollInCourseAction(courseId: string): Promise<ApiRespons
             data:{
                 courseId: course.id,
                 userId: session?.user.id,
+                status: "Completed",
             }
         });
         return{
@@ -58,3 +59,4 @@ catch(error){
     };
 }
 }
+
