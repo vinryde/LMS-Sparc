@@ -10,13 +10,16 @@ interface iAppProps{
         description:string | null;
     };
     slug:string;
+    isActive?:boolean;
+    completed:boolean;
 }
-export function LessonItem({lesson,slug}:iAppProps){
-    const completed= true;
+export function LessonItem({lesson,slug,isActive,completed}:iAppProps){
     return(
         <Link href={`/dashboard/${slug}/${lesson.id}`} className={buttonVariants({
             variant:completed ? "secondary" : "outline",
-            className:cn("w-full p-2.5 h-auto justify-start transition-all", completed && 'bg-green-300 dark:bg-green-900/30 border-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-800 dark:text-green-200')
+            className:cn("w-full p-2.5 h-auto justify-start transition-all", completed && 'bg-green-300 dark:bg-green-900/30 border-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-800 dark:text-green-200',
+                isActive && !completed && 'bg-primary/10 dark:bg-primary/20 border-primary/50 hover:bg-primary/20 dark:hover:bg-primary/30 text-primary dark:text-primary-foreground'
+            )
         }) }>
         <div className="flex items-center gap-2.5 w-full min-w-0 ">
             <div className="shrink-0">
@@ -25,18 +28,19 @@ export function LessonItem({lesson,slug}:iAppProps){
                         <Check className="size-3 text-white"/>
                     </div>
                 ):(
-                    <div className={cn("size-5 rounded-full border-2 bg-background flex items-center justify-center")}>
-                    <Play className={cn("size-2.5 fill-current")}/>
+                    <div className={cn("size-5 rounded-full border-2 bg-background flex items-center justify-center", isActive? "border-primary bg-primary/10 dark:bg-primary/20":"border-muted-foreground/60")}>
+                    <Play className={cn("size-2.5 fill-current", isActive? "text-primary":"text-muted-foreground")}/>
                 </div>
                 )}
 
             </div>
 
             <div className="flex-1 text-left min-w-0">
-                <p className={cn("text-xs font-medium truncate", completed && 'text-green-800 dark:text-green-200')}>{lesson.position}. {lesson.title}</p>
+                <p className={cn("text-xs font-medium truncate", completed ? 'text-green-800 dark:text-green-200':isActive? 'text-primary font-semibold dark:text-primary-foreground':'text-foreground')}>{lesson.position}. {lesson.title}</p>
                 {completed && (
                     <p className={cn("text-[10px] text-green-700 dark:text-green-300 font-medium")}>Completed</p>
                 )}
+             {isActive&&!completed&&<p className="text-[10px] text-primary font-medium">Currently Watching</p>}
             </div>
 
         </div>

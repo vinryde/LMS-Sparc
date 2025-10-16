@@ -11,7 +11,7 @@ export default async function CourseSlugLayout({params,children}:iAppProps){
     const {slug}= await params;
     const course= await getCourseSidebarData(slug);
     return(
-        <div className="flex flex-1">
+        <div className="flex flex-1 ">
             {/*sidebar-30*/}
             <div className="w-80 border-r border-border shrink-0">
                 <CourseSidebar course={course.course} />
