@@ -11,12 +11,12 @@ export function RenderDescriptionn({json}:{json:JSONContent}) {
     const output = useMemo(()=> {
         return generateHTML(json,[
             StarterKit, 
-                TextAlign.configure({types: ['heading', 'paragraph']})
+                TextAlign.configure({types: ['heading', 'paragraph',]})
         ]);
     },[json]);
 
     return (
-        <div className="prose dark:prose-invert prose-li:marker:text-primary">
+        <div className="prose dark:prose-invert prose-li:marker:text-primary max-w-none">
             {parse(output)}
         </div>
     );

@@ -19,6 +19,8 @@ import { toNextJsHandler } from "better-auth/next-js";
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import arcjet  from "@/lib/arcjet";
+import { APIError } from "better-auth";
+import { redirect } from "next/navigation";
 
 // The arcjet instance is created outside of the handler
 const aj = ({
@@ -131,11 +133,27 @@ export const POST = async (req: NextRequest) => {
         message = "Invalid email.";
       }
 
+
+
       return Response.json({ message }, { status: 400 });
     } else {
       return new Response(null, { status: 403 });
     }
   }
 
-  return authHandlers.POST(req);
+  try {
+  // Run the Better Auth handler (this executes sign-in / sign-up logic)
+  const response= await authHandlers.POST(req);
+  return response;
+  
+} catch (error ) {
+    if (error instanceof APIError) {
+        console.log(error.message, error.status)
+        if(error.status === "BAD_REQUEST"){
+            return redirect("/registrations-closed");
+        }
+        return redirect("/registrations-closed");
+    }
+}
+
 };

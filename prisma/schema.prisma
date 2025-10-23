@@ -22,7 +22,7 @@ model User {
   accounts      Account[]
   courses       Course[]
 
-  role       userRole? @default(Student)
+  role       userRole? @default(user)
   banned     Boolean?  @default(false)
   banReason  String?
   banExpires DateTime?
@@ -35,6 +35,7 @@ model User {
 enum userRole {
   Admin
   Student
+  user
 }
 
 model Session {

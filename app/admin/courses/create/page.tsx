@@ -190,9 +190,9 @@ export default function CourseCreationPage(){
                 )}/>
                 <FormField control={form.control} name="price" render={({ field }) => (
                     <FormItem className='w-full'>
-                        <FormLabel>Price</FormLabel>
+                        <FormLabel>Est. Activities</FormLabel>
                         <FormControl>
-                            <Input placeholder='Price' type='number' {...field}/>
+                            <Input placeholder='Activities' type='number' {...field}/>
                         </FormControl>
                         <FormMessage/>
                         </FormItem>

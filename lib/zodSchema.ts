@@ -13,6 +13,7 @@ export const courseCategories=["Climate Science Basics",
   "Global & Local Climate Challenges",
   "STEM for Sustainability",
   "Community Action & Awareness"] as const;
+export const userRoles = ["Admin", "Student", "user"] as const;
 export const courseSchema= z.object({
     title: z.string().min(3,{message:"Title must be at least 3 characters long"}).max(100,{message:"Title must be under 100 characters"}),
     description: z.string().min(10,{message:"Description must be at least 10 characters long"}),
@@ -41,6 +42,13 @@ export const lessonSchema = z.object({
     thumbnailKey: z.string().optional(),   
     documentKey: z.string().optional(),
 });
+
+export const userRoleSchema = z.enum(userRoles, {
+  message: "Invalid user role",
+});
+
 export type CourseSchemaType = z.infer<typeof courseSchema>;
 export type ChapterSchemaType = z.infer<typeof chapterSchema>;
 export type LessonSchemaType = z.infer<typeof lessonSchema>;
+export type UserRole = (typeof userRoles)[number]; // "Admin" | "Student" | "user"
+

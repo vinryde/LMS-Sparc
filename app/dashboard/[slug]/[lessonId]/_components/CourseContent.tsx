@@ -90,9 +90,11 @@ return(
             <RenderDescriptionn json={JSON.parse(data.description)} />
             
            )}
+           {data.documentKey && (
            <Link href={document}  className="text-primary font-medium">
                 View Resource
             </Link>
+        )}
         </div>
         
     </div>
