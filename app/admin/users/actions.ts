@@ -2,6 +2,7 @@
 import { requireAdmin } from "@/app/data/admin/require-admin";
 import { prisma } from "@/lib/db";
 import { userRoleSchema } from "@/lib/zodSchema";
+import { revalidatePath } from "next/cache";
 
 
 export async function UpdateUserRole(userid: string, userrole:string ){
@@ -16,5 +17,6 @@ export async function UpdateUserRole(userid: string, userrole:string ){
             role: validRole,
         }
     })
+    revalidatePath('/admin/users')
 
 }

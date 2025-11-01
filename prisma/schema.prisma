@@ -28,6 +28,8 @@ model User {
   banExpires DateTime?
   enrollment Enrollment[]
   lessonProgress LessonProgress[]
+  userQuizAnswer UserQuizAnswer[]
+  quizSubmissions QuizSubmission[]
 
   @@unique([email])
   @@map("user")
@@ -151,6 +153,7 @@ model Lesson{
   chapter   Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
   chapterId String
   lessonProgress LessonProgress[]
+  quiz Quiz?
 }
 
 model Enrollment{
@@ -183,4 +186,85 @@ model LessonProgress{
   @@unique([userId, lessonId])
   
   
+}
+
+model Quiz {
+  id        String   @id @default(uuid())
+  title     String
+  position  Int
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lessonId  String
+  
+  questions Question[]
+  submissions QuizSubmission[]
+  
+  @@unique([lessonId]) // One quiz per lesson
+}
+
+model Question {
+  id       String @id @default(uuid())
+  text     String
+  position Int
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  quiz     Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizId   String
+  
+  options  QuestionOption[]
+  userAnswers UserQuizAnswer[]
+}
+
+model QuestionOption {
+  id        String  @id @default(uuid())
+  text      String
+  isCorrect Boolean @default(false)
+  position  Int
+  
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String
+  
+  userAnswers UserQuizAnswer[]
+}
+
+model UserQuizAnswer {
+  id        String   @id @default(uuid())
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String
+  
+  selectedOption   QuestionOption @relation(fields: [selectedOptionId], references: [id], onDelete: Cascade)
+  selectedOptionId String
+  
+  @@unique([userId, questionId]) // One answer per question per user
+}
+
+model QuizSubmission {
+  id        String   @id @default(uuid())
+  
+  score          Int
+  totalQuestions Int
+  percentage     Int
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  
+  quiz   Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizId String
+  
+  @@unique([userId, quizId])
 }

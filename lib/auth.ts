@@ -50,8 +50,7 @@ export const auth = betterAuth({
         before: async (user, ctx) => {
 
           const count = await prisma.user.count();
-          if (count > 4) {
-            // Block signup by throwing an APIError (HTTP 400)
+          if (count > 100) {
             throw new APIError("BAD_REQUEST", {
               message: "User limit of 100 has been reached. Sign-ups are closed.",
             });

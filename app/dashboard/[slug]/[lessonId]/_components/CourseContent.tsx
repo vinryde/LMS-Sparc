@@ -10,6 +10,7 @@ import { useTransition } from "react";
 import { toast } from "sonner";
 import { markLessonComplete } from "../actions";
 import { useConfetti } from '@/hooks/use-confetti';
+import { QuizComponent } from "./QuizComponent";
 
 interface iAppProps{
     data: LessonContentType
@@ -95,6 +96,15 @@ return(
                 View Resource
             </Link>
         )}
+
+         {data.quiz && (
+              <div className="mt-8">
+                <QuizComponent 
+                  quiz={data.quiz} 
+                  slug={data.chapter.course.slug}
+                />
+              </div>
+            )}
         </div>
         
     </div>

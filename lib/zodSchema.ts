@@ -47,6 +47,41 @@ export const userRoleSchema = z.enum(userRoles, {
   message: "Invalid user role",
 });
 
+export const quizSchema = z.object({
+  title: z.string().min(3, {message: "Title must be at least 3 characters long"}),
+  lessonId: z.string().uuid({message: "Invalid lesson id"}),
+});
+
+export const questionSchema = z.object({
+  text: z.string().min(5, {message: "Question must be at least 5 characters long"}),
+  quizId: z.string().uuid({message: "Invalid quiz id"}),
+  options: z.array(z.object({
+    text: z.string().min(1, {message: "Option text is required"}),
+    isCorrect: z.boolean(),
+  })).min(2, {message: "At least 2 options are required"})
+    .max(6, {message: "Maximum 6 options allowed"}),
+});
+
+export const reorderQuestionsSchema = z.object({
+  quizId: z.string().uuid(),
+  questions: z.array(z.object({
+    id: z.string().uuid(),
+    position: z.number(),
+  })),
+});
+
+export const submitQuizAnswerSchema = z.object({
+  questionId: z.string().uuid(),
+  selectedOptionId: z.string().uuid(),
+});
+
+export type QuizSchemaType = z.infer<typeof quizSchema>;
+export type QuestionSchemaType = z.infer<typeof questionSchema>;
+export type ReorderQuestionsSchemaType = z.infer<typeof reorderQuestionsSchema>;
+export type SubmitQuizAnswerSchemaType = z.infer<typeof submitQuizAnswerSchema>;
+
+
+
 export type CourseSchemaType = z.infer<typeof courseSchema>;
 export type ChapterSchemaType = z.infer<typeof chapterSchema>;
 export type LessonSchemaType = z.infer<typeof lessonSchema>;

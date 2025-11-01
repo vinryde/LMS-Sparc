@@ -25,6 +25,60 @@ export async function getLessonContent(lessonId:string){
                lessonId: true,
             }
            },
+           quiz: {
+             select: {
+               id: true,
+               title: true,
+               questions: {
+                 orderBy: {
+                   position: 'asc',
+                 },
+                 select: {
+                   id: true,
+                   text: true,
+                   position: true,
+                   options: {
+                     orderBy: {
+                       position: 'asc',
+                     },
+                     select: {
+                       id: true,
+                       text: true,
+                       position: true,
+                     },
+                   },
+                   userAnswers: {
+                     where: {
+                       userId: session.user.id,
+                     },
+                     select: {
+                       id: true,
+                       selectedOptionId: true,
+                       selectedOption: {
+                         select: {
+                           isCorrect: true,
+                         },
+                       },
+                     },
+                   },
+                  
+                 },
+               },
+               submissions: {
+                 where: {
+                   userId: session.user.id,
+                 },
+                 select: {
+                   id: true,
+                   score: true,
+                   totalQuestions: true,
+                   percentage: true,
+                   createdAt: true,
+                 },
+               },
+             },
+           },
+           
            chapter:{
             select:{
                  
