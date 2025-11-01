@@ -30,6 +30,8 @@ model User {
   lessonProgress LessonProgress[]
   userQuizAnswer UserQuizAnswer[]
   quizSubmissions QuizSubmission[]
+  userAssessmentAnswers UserAssessmentAnswer[]
+  assessmentSubmissions AssessmentSubmission[]
 
   @@unique([email])
   @@map("user")
@@ -267,4 +269,103 @@ model QuizSubmission {
   quizId String
   
   @@unique([userId, quizId])
+}
+
+model Assessment {
+  id        String   @id @default(uuid())
+  title     String
+  description String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  sections  AssessmentSection[]
+  submissions AssessmentSubmission[]
+}
+
+model AssessmentSection {
+  id       String @id @default(uuid())
+  title    String
+  type     AssessmentSectionType
+  position Int
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  assessmentId String
+  
+  questions AssessmentQuestion[]
+}
+
+enum AssessmentSectionType {
+  KNOWLEDGE
+  ATTITUDE
+  BEHAVIOUR
+}
+
+model AssessmentQuestion {
+  id       String @id @default(uuid())
+  text     String
+  position Int
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  section   AssessmentSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  sectionId String
+  
+  options AssessmentQuestionOption[]
+  userAnswers UserAssessmentAnswer[]
+}
+
+model AssessmentQuestionOption {
+  id        String  @id @default(uuid())
+  text      String
+  isCorrect Boolean @default(false) // Only used for KNOWLEDGE section
+  position  Int
+  
+  question   AssessmentQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String
+  
+  userAnswers UserAssessmentAnswer[]
+}
+
+model UserAssessmentAnswer {
+  id        String   @id @default(uuid())
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  
+  question   AssessmentQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String
+  
+  selectedOption   AssessmentQuestionOption @relation(fields: [selectedOptionId], references: [id], onDelete: Cascade)
+  selectedOptionId String
+  
+  @@unique([userId, questionId])
+}
+
+model AssessmentSubmission {
+  id        String   @id @default(uuid())
+  
+  knowledgeScore     Int
+  knowledgeTotal     Int
+  knowledgePercentage Int
+  
+  completed Boolean @default(false)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  assessmentId String
+  
+  @@unique([userId, assessmentId])
 }

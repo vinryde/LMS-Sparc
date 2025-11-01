@@ -60,3 +60,18 @@ catch(error){
 }
 }
 
+export async function checkIfAssessmentCompleted(): Promise<boolean> {
+  const session = await requireUser();
+  
+  try {
+    const submission = await prisma.assessmentSubmission.findFirst({
+      where: {
+        userId: session.user.id,
+      },
+    });
+    
+    return !!submission;
+  } catch {
+    return false;
+  }
+}

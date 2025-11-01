@@ -14,6 +14,7 @@ export const courseCategories=["Climate Science Basics",
   "STEM for Sustainability",
   "Community Action & Awareness"] as const;
 export const userRoles = ["Admin", "Student", "user"] as const;
+export const assessmentSectionTypes = ["KNOWLEDGE", "ATTITUDE", "BEHAVIOUR"] as const;
 export const courseSchema= z.object({
     title: z.string().min(3,{message:"Title must be at least 3 characters long"}).max(100,{message:"Title must be under 100 characters"}),
     description: z.string().min(10,{message:"Description must be at least 10 characters long"}),
@@ -74,6 +75,52 @@ export const submitQuizAnswerSchema = z.object({
   questionId: z.string().uuid(),
   selectedOptionId: z.string().uuid(),
 });
+
+export const assessmentSchema = z.object({
+  title: z.string().min(3, {message: "Title must be at least 3 characters long"}),
+  description: z.string().optional(),
+});
+
+export const assessmentSectionSchema = z.object({
+  title: z.string().min(3, {message: "Title must be at least 3 characters long"}),
+  type: z.enum(assessmentSectionTypes, {message: "Section type is required"}),
+  assessmentId: z.string().uuid({message: "Invalid assessment id"}),
+});
+
+export const assessmentQuestionSchema = z.object({
+  text: z.string().min(5, {message: "Question must be at least 5 characters long"}),
+  sectionId: z.string().uuid({message: "Invalid section id"}),
+  options: z.array(z.object({
+    text: z.string().min(1, {message: "Option text is required"}),
+    isCorrect: z.boolean().optional(), // Only for KNOWLEDGE type
+  })).min(2, {message: "At least 2 options are required"})
+    .max(6, {message: "Maximum 6 options allowed"}),
+});
+
+export const reorderAssessmentQuestionsSchema = z.object({
+  sectionId: z.string().uuid(),
+  questions: z.array(z.object({
+    id: z.string().uuid(),
+    position: z.number(),
+  })),
+});
+
+export const submitAssessmentAnswerSchema = z.object({
+  questionId: z.string().uuid(),
+  selectedOptionId: z.string().uuid(),
+});
+
+export const submitAssessmentSchema = z.object({
+  assessmentId: z.string().uuid(),
+  answers: z.array(submitAssessmentAnswerSchema),
+});
+
+export type AssessmentSchemaType = z.infer<typeof assessmentSchema>;
+export type AssessmentSectionSchemaType = z.infer<typeof assessmentSectionSchema>;
+export type AssessmentQuestionSchemaType = z.infer<typeof assessmentQuestionSchema>;
+export type ReorderAssessmentQuestionsSchemaType = z.infer<typeof reorderAssessmentQuestionsSchema>;
+export type SubmitAssessmentAnswerSchemaType = z.infer<typeof submitAssessmentAnswerSchema>;
+export type SubmitAssessmentSchemaType = z.infer<typeof submitAssessmentSchema>;
 
 export type QuizSchemaType = z.infer<typeof quizSchema>;
 export type QuestionSchemaType = z.infer<typeof questionSchema>;
