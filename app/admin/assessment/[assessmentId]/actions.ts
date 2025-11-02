@@ -36,13 +36,29 @@ export async function createOrUpdateAssessment(
         data: {
           title: result.data.title,
           description: result.data.description,
+          courseId: result.data.courseId, // Add this line
         },
       });
     } else {
+      // Check if course already has an assessment
+      const existingAssessment = await prisma.assessment.findUnique({
+        where: {
+          courseId: result.data.courseId,
+        },
+      });
+
+      if (existingAssessment) {
+        return {
+          status: "error",
+          message: "This course already has an assessment. Please edit the existing one.",
+        };
+      }
+
       await prisma.assessment.create({
         data: {
           title: result.data.title,
           description: result.data.description,
+          courseId: result.data.courseId,
         },
       });
     }

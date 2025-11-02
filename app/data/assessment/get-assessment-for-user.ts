@@ -3,18 +3,18 @@ import { requireUser } from "../user/require-user";
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 
-export async function getAssessmentForUser() {
+export async function getAssessmentForCourse(courseId: string) {
   const session = await requireUser();
 
-  // Get the first (and only) assessment
-  const assessment = await prisma.assessment.findFirst({
-    orderBy: {
-      createdAt: 'desc',
+  const assessment = await prisma.assessment.findUnique({
+    where: {
+      courseId: courseId,
     },
     select: {
       id: true,
       title: true,
       description: true,
+      courseId: true,
       sections: {
         orderBy: {
           position: 'asc',
@@ -72,10 +72,10 @@ export async function getAssessmentForUser() {
   });
 
   if (!assessment) {
-    return notFound();
+    return null; // Return null instead of notFound to handle missing assessments gracefully
   }
 
   return assessment;
 }
 
-export type UserAssessmentType = Awaited<ReturnType<typeof getAssessmentForUser>>;
+export type UserCourseAssessmentType = Awaited<ReturnType<typeof getAssessmentForCourse>>;

@@ -79,6 +79,8 @@ export const submitQuizAnswerSchema = z.object({
 export const assessmentSchema = z.object({
   title: z.string().min(3, {message: "Title must be at least 3 characters long"}),
   description: z.string().optional(),
+  courseId: z.string().uuid({message: "Invalid course id"}),
+  
 });
 
 export const assessmentSectionSchema = z.object({

@@ -25,7 +25,7 @@ export function EnrollButton({ courseId, enrolled }: EnrollButtonProps) {
     startTransition(async () => {
       // Check if user already completed assessment
       const { data: hasCompleted, error: checkError } = await tryCatch(
-        checkIfAssessmentCompleted()
+        checkIfAssessmentCompleted(courseId)
       );
 
       if (checkError) {

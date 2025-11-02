@@ -30,9 +30,12 @@ export async function submitAssessment(
       };
     }
 
-    // Get assessment with sections and questions
+    // Verify assessment belongs to the course
     const assessment = await prisma.assessment.findUnique({
-      where: { id: assessmentId },
+      where: { 
+        id: assessmentId,
+        courseId: courseId,
+      },
       select: {
         sections: {
           select: {
@@ -57,7 +60,7 @@ export async function submitAssessment(
     if (!assessment) {
       return {
         status: "error",
-        message: "Assessment not found",
+        message: "Assessment not found for this course",
       };
     }
 

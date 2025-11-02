@@ -3,7 +3,8 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/general/EmptyState";
 import Link from "next/link";
-import { BookCheck, Users } from "lucide-react";
+import { BookCheck, Users, GraduationCap } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export default async function AssessmentsPage() {
   const assessments = await adminGetAllAssessments();
@@ -31,13 +32,26 @@ export default async function AssessmentsPage() {
           {assessments.map((assessment) => (
             <Card key={assessment.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookCheck className="size-5 text-primary" />
-                  {assessment.title}
-                </CardTitle>
-                {assessment.description && (
-                  <CardDescription>{assessment.description}</CardDescription>
-                )}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1">
+                    <CardTitle className="flex items-center gap-2">
+                      <BookCheck className="size-5 text-primary" />
+                      {assessment.title}
+                    </CardTitle>
+                    {assessment.description && (
+                      <CardDescription className="mt-2">{assessment.description}</CardDescription>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 mt-3">
+                  <GraduationCap className="size-4 text-muted-foreground" />
+                  <Link 
+                    href={`/courses/${assessment.course.slug}`}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {assessment.course.title}
+                  </Link>
+                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between text-sm">

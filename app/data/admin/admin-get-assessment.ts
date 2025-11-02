@@ -14,6 +14,13 @@ export async function adminGetAssessment(assessmentId: string) {
       title: true,
       description: true,
       createdAt: true,
+      courseId: true, 
+      course: {      
+        select: {
+          title: true,
+          slug: true,
+        },
+      },
       sections: {
         orderBy: {
           position: 'asc',
@@ -64,6 +71,13 @@ export async function adminGetAllAssessments() {
       title: true,
       description: true,
       createdAt: true,
+      courseId: true, 
+      course: {     
+        select: {
+          title: true,
+          slug: true,
+        },
+      },
       _count: {
         select: {
           sections: true,

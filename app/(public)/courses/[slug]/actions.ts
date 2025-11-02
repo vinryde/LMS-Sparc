@@ -60,13 +60,28 @@ catch(error){
 }
 }
 
-export async function checkIfAssessmentCompleted(): Promise<boolean> {
+export async function checkIfAssessmentCompleted(courseId: string): Promise<boolean> {
   const session = await requireUser();
   
   try {
+    // Get the assessment for this specific course
+    const assessment = await prisma.assessment.findUnique({
+      where: {
+        courseId: courseId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!assessment) {
+      return false; // No assessment for this course
+    }
+
     const submission = await prisma.assessmentSubmission.findFirst({
       where: {
         userId: session.user.id,
+        assessmentId: assessment.id,
       },
     });
     

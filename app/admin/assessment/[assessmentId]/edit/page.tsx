@@ -2,6 +2,9 @@ import { adminGetAssessment } from "@/app/data/admin/admin-get-assessment";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AssessmentStructure } from "./_components/AssessmentStructure";
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { GraduationCap } from "lucide-react";
 
 type Params = Promise<{ assessmentId: string }>;
 
@@ -26,6 +29,16 @@ export default async function EditAssessmentPage({ params }: { params: Params })
             <CardDescription>
               {assessment.description || "No description provided"}
             </CardDescription>
+            <div className="flex items-center gap-2 mt-4">
+              <GraduationCap className="size-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Course:</span>
+              <Link 
+                href={`/courses/${assessment.course.slug}`}
+                className="text-sm text-primary hover:underline font-medium"
+              >
+                {assessment.course.title}
+              </Link>
+            </div>
           </CardHeader>
         </Card>
 

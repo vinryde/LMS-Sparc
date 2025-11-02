@@ -14,10 +14,10 @@ import { tryCatch } from "@/hooks/try-catch";
 import { submitAssessment } from "../actions";
 import { cn } from "@/lib/utils";
 import { useConfetti } from "@/hooks/use-confetti";
-import { UserAssessmentType } from "@/app/data/assessment/get-assessment-for-user";
+import { UserCourseAssessmentType } from "@/app/data/assessment/get-assessment-for-user";
 
 interface TakeAssessmentComponentProps {
-  assessment: UserAssessmentType;
+  assessment: NonNullable<UserCourseAssessmentType>;
 }
 
 export function TakeAssessmentComponent({ assessment }: TakeAssessmentComponentProps) {
@@ -192,7 +192,7 @@ export function TakeAssessmentComponent({ assessment }: TakeAssessmentComponentP
     );
   }
 
-  // Assessment Taking View
+  // Assessment Taking View - Rest of the component remains the same...
   return (
     <div className="space-y-6">
       <Card>
