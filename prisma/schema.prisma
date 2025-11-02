@@ -163,6 +163,9 @@ model Lesson{
 model Enrollment{
   id String @id @default(uuid())
   status EnrollmentStatus @default(Active)
+  expiresAt DateTime? 
+  isExpired Boolean @default(false) 
+  expirationDisabled Boolean @default(false) 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
@@ -176,6 +179,7 @@ enum EnrollmentStatus {
   Active
   Completed
   Dropped
+  Expired
 }
 
 model LessonProgress{

@@ -1,7 +1,10 @@
+// Update: app/data/course/get-lesson-content.ts
 import "server-only";
 import { requireUser } from "../user/require-user";
 import { prisma } from "@/lib/db";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { isEnrollmentExpired } from "@/lib/check-enrollment-expiration";
+
 export async function getLessonContent(lessonId:string){
     const session = await requireUser();
     const lesson = await prisma.lesson.findUnique({
@@ -92,6 +95,7 @@ export async function getLessonContent(lessonId:string){
            }
         }
     });
+    
     if(!lesson){
         return notFound();
     }
@@ -107,10 +111,18 @@ export async function getLessonContent(lessonId:string){
            status:true,
         }
     });
-    if(!enrollment||enrollment.status !== "Completed"){
+    
+    if(!enrollment || enrollment.status !== "Completed"){
         return notFound();
     }
+    
+    // Check if enrollment has expired
+    const expired = await isEnrollmentExpired(session.user.id, lesson.chapter.courseId);
+    if(expired){
+        redirect(`/course-expired?courseId=${lesson.chapter.courseId}`);
+    }
+    
     return lesson;
-
 }
-export type LessonContentType= Awaited<ReturnType<typeof getLessonContent>>;
+
+export type LessonContentType = Awaited<ReturnType<typeof getLessonContent>>;

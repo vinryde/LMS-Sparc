@@ -31,40 +31,53 @@ export async function enrollInCourseAction(courseId: string): Promise<ApiRespons
                 }
             }
         });
+        
         if(existingEnrollment){
+            // Check if enrollment is expired
+            if(existingEnrollment.isExpired || existingEnrollment.status === "Expired"){
+                return{
+                    status: "error",
+                    message:"Your enrollment in this course has expired",
+                };
+            }
             return{
                 status: "enrolled",
                 message:"You have already enrolled in this course",
             };
         }
+        
+        // Calculate expiration date (30 days from now)
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 30);
+        
         const enrollment= await prisma.enrollment.create({
             data:{
                 courseId: course.id,
                 userId: session?.user.id,
                 status: "Completed",
+                expiresAt: expiresAt,
+                isExpired: false,
+                expirationDisabled: false,
             }
         });
         return{
             status: "success",
             message:"You have successfully enrolled in the course",
         };
-       
-
-}
-catch(error){
-    console.error("Error enrolling in course:", error);
-    return{
-        status: "error",
-        message:"Failed to enroll in the course",
-    };
-}
+    }
+    catch(error){
+        console.error("Error enrolling in course:", error);
+        return{
+            status: "error",
+            message:"Failed to enroll in the course",
+        };
+    }
 }
 
 export async function checkIfAssessmentCompleted(courseId: string): Promise<boolean> {
   const session = await requireUser();
   
   try {
-    // Get the assessment for this specific course
     const assessment = await prisma.assessment.findUnique({
       where: {
         courseId: courseId,
@@ -75,7 +88,7 @@ export async function checkIfAssessmentCompleted(courseId: string): Promise<bool
     });
 
     if (!assessment) {
-      return false; // No assessment for this course
+      return false;
     }
 
     const submission = await prisma.assessmentSubmission.findFirst({

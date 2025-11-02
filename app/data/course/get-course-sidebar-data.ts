@@ -1,12 +1,13 @@
 import "server-only"
 import { requireUser } from "../user/require-user"
 import { prisma } from "@/lib/db";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { isEnrollmentExpired } from "@/lib/check-enrollment-expiration";
 
 export async function getCourseSidebarData(slug:string){
     const session = await requireUser();
 
-    const course= await prisma.course.findUnique({
+    const course = await prisma.course.findUnique({
        where:{
         slug: slug,
        },
@@ -52,9 +53,11 @@ export async function getCourseSidebarData(slug:string){
          },
        },
     });
+    
     if(!course){
         return notFound();
     }
+
     const enrollment = await prisma.enrollment.findUnique({
         where:{
            userId_courseId:{
@@ -67,9 +70,14 @@ export async function getCourseSidebarData(slug:string){
     if(!enrollment || enrollment.status !== "Completed"){
         return notFound();
     }
-    return{course,
-        
-    };
+    
+    // Check if enrollment has expired
+    const expired = await isEnrollmentExpired(session.user.id, course.id);
+    if(expired){
+        redirect(`/course-expired?courseId=${course.id}`);
+    }
+    
+    return {course};
 }
 
-export type CourseSidebarDataType= Awaited<ReturnType<typeof getCourseSidebarData>>;
+export type CourseSidebarDataType = Awaited<ReturnType<typeof getCourseSidebarData>>;
