@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { markLessonComplete } from "../actions";
 import { useConfetti } from '@/hooks/use-confetti';
 import { QuizComponent } from "./QuizComponent";
+import { FeedbackComponent } from "./FeedbackComponent";
 
 interface iAppProps{
     data: LessonContentType
@@ -105,6 +106,14 @@ return(
                 />
               </div>
             )}
+            {data.feedback && (
+  <div className="mt-8">
+    <FeedbackComponent 
+      feedback={data.feedback} 
+      slug={data.chapter.course.slug}
+    />
+  </div>
+)}
         </div>
         
     </div>

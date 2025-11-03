@@ -168,6 +168,54 @@ export async function markLessonComplete(lessonId:string,slug:string):Promise<Ap
 
 }
 
+export async function submitFeedback(
+  feedbackId: string,
+  content: string,
+  slug: string
+): Promise<ApiResponse> {
+  const session = await requireUser();
+
+  try {
+    // Check if already submitted
+    const existingSubmission = await prisma.feedbackSubmission.findUnique({
+      where: {
+        userId_feedbackId: {
+          userId: session.user.id,
+          feedbackId: feedbackId,
+        },
+      },
+    });
+
+    if (existingSubmission) {
+      return {
+        status: "error",
+        message: "You have already submitted feedback for this lesson",
+      };
+    }
+
+    // Create submission
+    await prisma.feedbackSubmission.create({
+      data: {
+        userId: session.user.id,
+        feedbackId: feedbackId,
+        content: content,
+      },
+    });
+
+    revalidatePath(`/dashboard/${slug}`);
+    return {
+      status: "success",
+      message: "Thank you for your feedback!",
+    };
+  } catch (error) {
+    console.error("Submit feedback error:", error);
+    return {
+      status: "error",
+      message: "Failed to submit feedback",
+    };
+  }
+}
+
 
 
 //quiz

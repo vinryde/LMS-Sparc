@@ -81,6 +81,23 @@ export async function getLessonContent(lessonId:string){
                },
              },
            },
+           feedback: {
+  select: {
+    id: true,
+    title: true,
+    description: true,
+    submissions: {
+      where: {
+        userId: session.user.id,
+      },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+      },
+    },
+  },
+},
            
            chapter:{
             select:{

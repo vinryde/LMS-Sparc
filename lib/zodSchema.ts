@@ -117,6 +117,20 @@ export const submitAssessmentSchema = z.object({
   answers: z.array(submitAssessmentAnswerSchema),
 });
 
+export const feedbackSchema = z.object({
+  title: z.string().min(3, {message: "Title must be at least 3 characters long"}),
+  description: z.string().optional(),
+  lessonId: z.string().uuid({message: "Invalid lesson id"}),
+});
+
+export const feedbackSubmissionSchema = z.object({
+  feedbackId: z.string().uuid({message: "Invalid feedback id"}),
+  content: z.string().min(10, {message: "Feedback must be at least 10 characters long"}).max(5000, {message: "Feedback must be under 5000 characters"}),
+});
+
+export type FeedbackSchemaType = z.infer<typeof feedbackSchema>;
+export type FeedbackSubmissionSchemaType = z.infer<typeof feedbackSubmissionSchema>;
+
 export type AssessmentSchemaType = z.infer<typeof assessmentSchema>;
 export type AssessmentSectionSchemaType = z.infer<typeof assessmentSectionSchema>;
 export type AssessmentQuestionSchemaType = z.infer<typeof assessmentQuestionSchema>;

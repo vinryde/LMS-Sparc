@@ -8,7 +8,7 @@ import { lessonSchema, LessonSchemaType, quizSchema,
   reorderQuestionsSchema,
   QuizSchemaType,
   QuestionSchemaType,
-  ReorderQuestionsSchemaType, } from "@/lib/zodSchema";
+  ReorderQuestionsSchemaType, feedbackSchema, type FeedbackSchemaType } from "@/lib/zodSchema";
 import { revalidatePath } from "next/cache";
 
 export async function updateLesson(values: LessonSchemaType, lessonId: string): Promise<ApiResponse>{
@@ -421,6 +421,112 @@ export async function getQuizData(lessonId: string) {
     return quiz;
   } catch (error) {
     console.error("Failed to fetch quiz:", error);
+    return null;
+  }
+}
+
+// Feedback Actions
+export async function createOrUpdateFeedback(
+  values: FeedbackSchemaType,
+  lessonId: string
+): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const result = feedbackSchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid data",
+      };
+    }
+
+    // Check if feedback already exists
+    const existingFeedback = await prisma.feedback.findUnique({
+      where: {
+        lessonId: lessonId,
+      },
+    });
+
+    if (existingFeedback) {
+      await prisma.feedback.update({
+        where: {
+          id: existingFeedback.id,
+        },
+        data: {
+          title: result.data.title,
+          description: result.data.description,
+        },
+      });
+    } else {
+      await prisma.feedback.create({
+        data: {
+          title: result.data.title,
+          description: result.data.description,
+          lessonId: lessonId,
+        },
+      });
+    }
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: "success",
+      message: "Feedback saved successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to save feedback",
+    };
+  }
+}
+
+export async function deleteFeedback(feedbackId: string): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    await prisma.feedback.delete({
+      where: {
+        id: feedbackId,
+      },
+    });
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: "success",
+      message: "Feedback deleted successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to delete feedback",
+    };
+  }
+}
+
+export async function getFeedbackData(lessonId: string) {
+  await requireAdmin();
+
+  try {
+    const feedback = await prisma.feedback.findUnique({
+      where: {
+        lessonId: lessonId,
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        _count: {
+          select: {
+            submissions: true,
+          },
+        },
+      },
+    });
+
+    return feedback;
+  } catch (error) {
+    console.error("Failed to fetch feedback:", error);
     return null;
   }
 }

@@ -14,10 +14,11 @@ import { RichTextEditor } from "@/components/rich-text-editor/Editor";
 import { Uploader } from "@/components/file-uploader/Uploader";
 import { useTransition, useState, useEffect } from "react";
 import { tryCatch } from "@/hooks/try-catch";
-import { updateLesson, getQuizData } from "../actions";
+import { updateLesson, getQuizData, getFeedbackData } from "../actions";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import { QuizManager } from "./QuizManager";
+import { FeedbackManager } from "./FeedbackManager";
 
 interface iAppProps {
     data: AdminLessonType;
@@ -28,7 +29,9 @@ interface iAppProps {
 export function LessonForm({chapterId, data, courseId}: iAppProps) {
     const [pending, startTransition] = useTransition();
     const [quizData, setQuizData] = useState<any>(null);
+    const [feedbackData, setFeedbackData] = useState<any>(null);
     const [isLoadingQuiz, setIsLoadingQuiz] = useState(true);
+    const [isLoadingFeedback, setIsLoadingFeedback] = useState(true);
     
     const form = useForm<LessonSchemaType>({
         resolver: zodResolver(lessonSchema),
@@ -43,22 +46,32 @@ export function LessonForm({chapterId, data, courseId}: iAppProps) {
         },
     });
 
-    // Fetch quiz data on mount
+    // Fetch quiz and feedback data on mount
     useEffect(() => {
-        async function fetchQuiz() {
+        async function fetchData() {
             setIsLoadingQuiz(true);
+            setIsLoadingFeedback(true);
+            
             try {
-                const { data: result, error } = await tryCatch(getQuizData(data.id));
-                if (!error && result) {
-                    setQuizData(result);
+                // Fetch quiz
+                const { data: quizResult, error: quizError } = await tryCatch(getQuizData(data.id));
+                if (!quizError && quizResult) {
+                    setQuizData(quizResult);
+                }
+                
+                // Fetch feedback
+                const { data: feedbackResult, error: feedbackError } = await tryCatch(getFeedbackData(data.id));
+                if (!feedbackError && feedbackResult) {
+                    setFeedbackData(feedbackResult);
                 }
             } catch (error) {
-                console.error("Failed to fetch quiz:", error);
+                console.error("Failed to fetch data:", error);
             } finally {
                 setIsLoadingQuiz(false);
+                setIsLoadingFeedback(false);
             }
         }
-        fetchQuiz();
+        fetchData();
     }, [data.id]);
 
     function onSubmit(values: LessonSchemaType) {
@@ -180,6 +193,31 @@ export function LessonForm({chapterId, data, courseId}: iAppProps) {
                             lessonId={data.id} 
                             initialQuiz={quizData}
                             onQuizUpdate={(updatedQuiz) => setQuizData(updatedQuiz)}
+                        />
+                    )}
+                </CardContent>
+            </Card>
+
+            <Separator className="my-6" />
+
+            {/* Feedback Section */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Student Feedback (Optional)</CardTitle>
+                    <CardDescription>
+                        Collect feedback from students about this lesson to improve your content
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {isLoadingFeedback ? (
+                        <div className="flex items-center justify-center py-8">
+                            <div className="text-sm text-muted-foreground">Loading feedback...</div>
+                        </div>
+                    ) : (
+                        <FeedbackManager 
+                            lessonId={data.id} 
+                            initialFeedback={feedbackData}
+                            onFeedbackUpdate={(updatedFeedback) => setFeedbackData(updatedFeedback)}
                         />
                     )}
                 </CardContent>

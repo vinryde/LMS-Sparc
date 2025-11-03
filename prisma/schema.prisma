@@ -32,6 +32,7 @@ model User {
   quizSubmissions QuizSubmission[]
   userAssessmentAnswers UserAssessmentAnswer[]
   assessmentSubmissions AssessmentSubmission[]
+  feedbackSubmissions FeedbackSubmission[]
 
   @@unique([email])
   @@map("user")
@@ -158,6 +159,7 @@ model Lesson{
   chapterId String
   lessonProgress LessonProgress[]
   quiz Quiz?
+  feedback Feedback?
 }
 
 model Enrollment{
@@ -275,6 +277,39 @@ model QuizSubmission {
   quizId String
   
   @@unique([userId, quizId])
+}
+
+model Feedback {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lessonId  String
+  
+  submissions FeedbackSubmission[]
+  
+  @@unique([lessonId]) // One feedback per lesson
+}
+
+model FeedbackSubmission {
+  id        String   @id @default(uuid())
+  
+  content   String   // The student's feedback text
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  
+  feedback   Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+  feedbackId String
+  
+  @@unique([userId, feedbackId]) // One submission per user per feedback
 }
 
 model Assessment {
