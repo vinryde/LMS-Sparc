@@ -15,6 +15,7 @@ export const courseCategories=["Climate Science Basics",
   "Community Action & Awareness"] as const;
 export const userRoles = ["Admin", "Student", "user"] as const;
 export const assessmentSectionTypes = ["KNOWLEDGE", "ATTITUDE", "BEHAVIOUR"] as const;
+export const resourceTypes = ["TEXT", "LINK", "IMAGE", "DOCUMENT"] as const;
 export const courseSchema= z.object({
     title: z.string().min(3,{message:"Title must be at least 3 characters long"}).max(100,{message:"Title must be under 100 characters"}),
     description: z.string().min(10,{message:"Description must be at least 10 characters long"}),
@@ -127,6 +128,28 @@ export const feedbackSubmissionSchema = z.object({
   feedbackId: z.string().uuid({message: "Invalid feedback id"}),
   content: z.string().min(10, {message: "Feedback must be at least 10 characters long"}).max(5000, {message: "Feedback must be under 5000 characters"}),
 });
+
+export const resourceSchema = z.object({
+  title: z.string().min(3, {message: "Title must be at least 3 characters long"}),
+  type: z.enum(resourceTypes, {message: "Resource type is required"}),
+  lessonId: z.string().uuid({message: "Invalid lesson id"}),
+  textContent: z.string().optional(),
+  linkUrl: z.string().url({message: "Invalid URL"}).optional(),
+  imageKey: z.string().optional(),
+  documentKey: z.string().optional(),
+});
+
+export const reorderResourcesSchema = z.object({
+  lessonId: z.string().uuid(),
+  resources: z.array(z.object({
+    id: z.string().uuid(),
+    position: z.number(),
+  })),
+});
+
+export type ResourceSchemaType = z.infer<typeof resourceSchema>;
+export type ReorderResourcesSchemaType = z.infer<typeof reorderResourcesSchema>;
+export type ResourceType = (typeof resourceTypes)[number];
 
 export type FeedbackSchemaType = z.infer<typeof feedbackSchema>;
 export type FeedbackSubmissionSchemaType = z.infer<typeof feedbackSubmissionSchema>;

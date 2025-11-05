@@ -8,7 +8,8 @@ import { lessonSchema, LessonSchemaType, quizSchema,
   reorderQuestionsSchema,
   QuizSchemaType,
   QuestionSchemaType,
-  ReorderQuestionsSchemaType, feedbackSchema, type FeedbackSchemaType } from "@/lib/zodSchema";
+  ReorderQuestionsSchemaType, feedbackSchema, type FeedbackSchemaType,resourceSchema, reorderResourcesSchema, type ResourceSchemaType, type ReorderResourcesSchemaType } from "@/lib/zodSchema";
+
 import { revalidatePath } from "next/cache";
 
 export async function updateLesson(values: LessonSchemaType, lessonId: string): Promise<ApiResponse>{
@@ -530,4 +531,300 @@ export async function getFeedbackData(lessonId: string) {
     return null;
   }
 }
+
+export async function getResourcesData(lessonId: string) {
+  await requireAdmin();
+
+  try {
+    const resources = await prisma.resource.findMany({
+      where: {
+        lessonId: lessonId,
+      },
+      orderBy: {
+        position: 'asc',
+      },
+      select: {
+        id: true,
+        title: true,
+        type: true,
+        position: true,
+        textContent: true,
+        linkUrl: true,
+        imageKey: true,
+        documentKey: true,
+      },
+    });
+
+    return resources;
+  } catch (error) {
+    console.error("Failed to fetch resources:", error);
+    return null;
+  }
+}
+
+// Create a new resource
+export async function createResource(
+  values: ResourceSchemaType
+): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const result = resourceSchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid data",
+      };
+    }
+
+    // Validate that required fields for the resource type are present
+    if (result.data.type === "TEXT" && !result.data.textContent) {
+      return {
+        status: "error",
+        message: "Text content is required for TEXT resources",
+      };
+    }
+    if (result.data.type === "LINK" && !result.data.linkUrl) {
+      return {
+        status: "error",
+        message: "Link URL is required for LINK resources",
+      };
+    }
+    if (result.data.type === "IMAGE" && !result.data.imageKey) {
+      return {
+        status: "error",
+        message: "Image is required for IMAGE resources",
+      };
+    }
+    if (result.data.type === "DOCUMENT" && !result.data.documentKey) {
+      return {
+        status: "error",
+        message: "Document is required for DOCUMENT resources",
+      };
+    }
+
+    // Get max position
+    const maxPos = await prisma.resource.findFirst({
+      where: {
+        lessonId: result.data.lessonId,
+      },
+      select: {
+        position: true,
+      },
+      orderBy: {
+        position: 'desc',
+      },
+    });
+
+    // Create resource
+    await prisma.resource.create({
+      data: {
+        title: result.data.title,
+        type: result.data.type,
+        lessonId: result.data.lessonId,
+        position: (maxPos?.position ?? 0) + 1,
+        textContent: result.data.textContent,
+        linkUrl: result.data.linkUrl,
+        imageKey: result.data.imageKey,
+        documentKey: result.data.documentKey,
+      },
+    });
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: "success",
+      message: "Resource created successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to create resource",
+    };
+  }
+}
+
+// Update a resource
+export async function updateResource(
+  values: ResourceSchemaType,
+  resourceId: string
+): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const result = resourceSchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid data",
+      };
+    }
+
+    // Validate required fields
+    if (result.data.type === "TEXT" && !result.data.textContent) {
+      return {
+        status: "error",
+        message: "Text content is required for TEXT resources",
+      };
+    }
+    if (result.data.type === "LINK" && !result.data.linkUrl) {
+      return {
+        status: "error",
+        message: "Link URL is required for LINK resources",
+      };
+    }
+    if (result.data.type === "IMAGE" && !result.data.imageKey) {
+      return {
+        status: "error",
+        message: "Image is required for IMAGE resources",
+      };
+    }
+    if (result.data.type === "DOCUMENT" && !result.data.documentKey) {
+      return {
+        status: "error",
+        message: "Document is required for DOCUMENT resources",
+      };
+    }
+
+    await prisma.resource.update({
+      where: {
+        id: resourceId,
+      },
+      data: {
+        title: result.data.title,
+        type: result.data.type,
+        textContent: result.data.textContent,
+        linkUrl: result.data.linkUrl,
+        imageKey: result.data.imageKey,
+        documentKey: result.data.documentKey,
+      },
+    });
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: "success",
+      message: "Resource updated successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to update resource",
+    };
+  }
+}
+
+// Delete a resource
+export async function deleteResource({
+  resourceId,
+  lessonId,
+}: {
+  resourceId: string;
+  lessonId: string;
+}): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const lessonWithResources = await prisma.lesson.findUnique({
+      where: {
+        id: lessonId,
+      },
+      select: {
+        resources: {
+          orderBy: {
+            position: 'asc',
+          },
+          select: {
+            id: true,
+            position: true,
+          },
+        },
+      },
+    });
+
+    if (!lessonWithResources) {
+      return {
+        status: 'error',
+        message: 'Lesson not found.',
+      };
+    }
+
+    const resources = lessonWithResources.resources;
+    const resourceToDelete = resources.find((r) => r.id === resourceId);
+
+    if (!resourceToDelete) {
+      return {
+        status: 'error',
+        message: 'Resource not found.',
+      };
+    }
+
+    const remainingResources = resources.filter((r) => r.id !== resourceId);
+    const updates = remainingResources.map((resource, index) =>
+      prisma.resource.update({
+        where: { id: resource.id },
+        data: { position: index + 1 },
+      })
+    );
+
+    await prisma.$transaction([
+      ...updates,
+      prisma.resource.delete({
+        where: { id: resourceId },
+      }),
+    ]);
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: 'success',
+      message: 'Resource deleted successfully.',
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to delete resource.",
+    };
+  }
+}
+
+// Reorder resources
+export async function reorderResources(
+  values: ReorderResourcesSchemaType
+): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const result = reorderResourcesSchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid data",
+      };
+    }
+
+    const updates = result.data.resources.map((resource) =>
+      prisma.resource.update({
+        where: {
+          id: resource.id,
+        },
+        data: {
+          position: resource.position,
+        },
+      })
+    );
+
+    await prisma.$transaction(updates);
+    revalidatePath(`/admin/courses`);
+
+    return {
+      status: "success",
+      message: "Resources reordered successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to reorder resources",
+    };
+  }
+}
+
+
 

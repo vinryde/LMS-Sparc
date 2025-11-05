@@ -14,11 +14,12 @@ import { RichTextEditor } from "@/components/rich-text-editor/Editor";
 import { Uploader } from "@/components/file-uploader/Uploader";
 import { useTransition, useState, useEffect } from "react";
 import { tryCatch } from "@/hooks/try-catch";
-import { updateLesson, getQuizData, getFeedbackData } from "../actions";
+import { updateLesson, getQuizData, getFeedbackData, getResourcesData } from "../actions";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import { QuizManager } from "./QuizManager";
 import { FeedbackManager } from "./FeedbackManager";
+import { ResourceManager } from "./ResourceManager";
 
 interface iAppProps {
     data: AdminLessonType;
@@ -30,8 +31,10 @@ export function LessonForm({chapterId, data, courseId}: iAppProps) {
     const [pending, startTransition] = useTransition();
     const [quizData, setQuizData] = useState<any>(null);
     const [feedbackData, setFeedbackData] = useState<any>(null);
+    const [resourcesData, setResourcesData] = useState<any[]>([]);
     const [isLoadingQuiz, setIsLoadingQuiz] = useState(true);
     const [isLoadingFeedback, setIsLoadingFeedback] = useState(true);
+    const [isLoadingResources, setIsLoadingResources] = useState(true);
     
     const form = useForm<LessonSchemaType>({
         resolver: zodResolver(lessonSchema),
@@ -46,11 +49,12 @@ export function LessonForm({chapterId, data, courseId}: iAppProps) {
         },
     });
 
-    // Fetch quiz and feedback data on mount
+    // Fetch quiz, feedback, and resources data on mount
     useEffect(() => {
         async function fetchData() {
             setIsLoadingQuiz(true);
             setIsLoadingFeedback(true);
+            setIsLoadingResources(true);
             
             try {
                 // Fetch quiz
@@ -64,11 +68,18 @@ export function LessonForm({chapterId, data, courseId}: iAppProps) {
                 if (!feedbackError && feedbackResult) {
                     setFeedbackData(feedbackResult);
                 }
+
+                // Fetch resources
+                const { data: resourcesResult, error: resourcesError } = await tryCatch(getResourcesData(data.id));
+                if (!resourcesError && resourcesResult) {
+                    setResourcesData(resourcesResult || []);
+                }
             } catch (error) {
                 console.error("Failed to fetch data:", error);
             } finally {
                 setIsLoadingQuiz(false);
                 setIsLoadingFeedback(false);
+                setIsLoadingResources(false);
             }
         }
         fetchData();
@@ -222,6 +233,32 @@ export function LessonForm({chapterId, data, courseId}: iAppProps) {
                     )}
                 </CardContent>
             </Card>
+
+            <Separator className="my-6" />
+
+            {/* Resources Section */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Resources (Optional)</CardTitle>
+                    <CardDescription>
+                        Add additional learning resources like text notes, links, images, or documents for students
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {isLoadingResources ? (
+                        <div className="flex items-center justify-center py-8">
+                            <div className="text-sm text-muted-foreground">Loading resources...</div>
+                        </div>
+                    ) : (
+                        <ResourceManager 
+                            lessonId={data.id} 
+                            initialResources={resourcesData}
+                            onResourceUpdate={(updatedResources) => setResourcesData(updatedResources)}
+                        />
+                    )}
+                </CardContent>
+            </Card>
         </div>
     );
 }
+

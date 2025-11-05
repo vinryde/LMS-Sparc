@@ -160,6 +160,7 @@ model Lesson{
   lessonProgress LessonProgress[]
   quiz Quiz?
   feedback Feedback?
+  resources Resource[]
 }
 
 model Enrollment{
@@ -412,4 +413,29 @@ model AssessmentSubmission {
   assessmentId String
   
   @@unique([userId, assessmentId])
+}
+model Resource {
+  id          String       @id @default(uuid())
+  title       String
+  type        ResourceType
+  position    Int
+  
+  // Fields for different resource types
+  textContent String?      // For TEXT type
+  linkUrl     String?      // For LINK type
+  imageKey    String?      // For IMAGE type
+  documentKey String?      // For DOCUMENT type
+  
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  lesson      Lesson       @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lessonId    String
+}
+
+enum ResourceType {
+  TEXT
+  LINK
+  IMAGE
+  DOCUMENT
 }

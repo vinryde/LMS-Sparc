@@ -98,6 +98,21 @@ export async function getLessonContent(lessonId:string){
     },
   },
 },
+ resources: {
+             orderBy: {
+               position: 'asc',
+             },
+             select: {
+               id: true,
+               title: true,
+               type: true,
+               position: true,
+               textContent: true,
+               linkUrl: true,
+               imageKey: true,
+               documentKey: true,
+             },
+           },
            
            chapter:{
             select:{
