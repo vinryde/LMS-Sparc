@@ -13,6 +13,7 @@ import {
   IconSearch,
   IconSettings,
   IconUsers,
+  IconTextSpellcheck
 } from "@tabler/icons-react"
 
 import { NavMain } from "@/components/sidebar/nav-main"
@@ -49,9 +50,9 @@ const data = {
       icon: IconListDetails,
     },
     {
-      title: "Analytics",
-      url: "#",
-      icon: IconChartBar,
+      title: "Assessment",
+      url: "/admin/assessment",
+      icon: IconTextSpellcheck,
     },
     {
       title: "Projects",
