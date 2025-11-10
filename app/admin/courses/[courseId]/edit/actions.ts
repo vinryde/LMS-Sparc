@@ -57,8 +57,8 @@ export async function EditCourse(data: CourseSchemaType, courseId: string): Prom
             ...result.data,
         }
     }); 
-    revalidatePath(`/admin/courses/${courseId}`);
-    revalidatePath(`/admin/courses/`);
+    revalidatePath(`/courses/${courseId}`);
+    revalidatePath(`/courses/`);
 
 return {
     status: "success",

@@ -50,7 +50,7 @@ export async function CreateCourse(values: CourseSchemaType): Promise<ApiRespons
             userId:session?.user.id as string,
         }
     });
-    revalidatePath("/admin/courses");
+    revalidatePath("/courses");
     return{
         status: "success",
         message:"Course Created",
