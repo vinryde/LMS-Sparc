@@ -18,6 +18,15 @@ export function EnrolledCourseCard({data}:iAppProps){
     const thumbnailUrl=useConstructUrl(data.course.fileKey)
     const{totallessons,completedlessons,progressPercentage}=useCourseProgress({courseData:data.course as any})
     return(
+        <div className="*:data-[slot=card]:from-primary/15 
+
+                   *:data-[slot=card]:to-card 
+
+                   dark:*:data-[slot=card]:bg-card 
+
+                   *:data-[slot=card]:bg-gradient-to-t 
+
+                   *:data-[slot=card]:shadow-xs">
         <Card className="group relative py-0 gap-0">
             <Badge variant="default" className="absolute top-2 right-2 z-10">
             {data.course.level}
@@ -49,6 +58,7 @@ export function EnrolledCourseCard({data}:iAppProps){
             </CardContent>
 
         </Card>
+        </div>
     )
 }
 

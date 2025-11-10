@@ -179,15 +179,9 @@ export default function CourseCreationPage(){
                         <FormMessage/>
                         </FormItem>
                 )}/>
-                <FormField control={form.control} name="duration" render={({ field }) => (
-                    <FormItem className='w-full'>
-                        <FormLabel>Duration (hours)</FormLabel>
-                        <FormControl>
-                            <Input placeholder='Duration' type='number' {...field}/>
-                        </FormControl>
-                        <FormMessage/>
-                        </FormItem>
-                )}/>
+                
+                
+                {/*
                 <FormField control={form.control} name="price" render={({ field }) => (
                     <FormItem className='w-full'>
                         <FormLabel>Est. Activities</FormLabel>
@@ -197,7 +191,19 @@ export default function CourseCreationPage(){
                         <FormMessage/>
                         </FormItem>
                 )}/>
+                */}
                </div>
+
+               <FormField control={form.control} name="duration" render={({ field }) => (
+                    <FormItem className='w-full'>
+                        <FormLabel>Duration (hours)</FormLabel>
+                        <FormControl>
+                            <Input placeholder='Duration' type='number' {...field}/>
+                        </FormControl>
+                        <FormMessage/>
+                        </FormItem>
+                )}/>
+                
                <FormField control={form.control} name="status" render={({ field }) => (
                     <FormItem className='w-full'>
                         <FormLabel>Status</FormLabel>

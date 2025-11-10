@@ -32,7 +32,7 @@ export function EditCourseForm({data}: iAppProps) {
       title:data.title ,
       description:data.description,
       fileKey:data.fileKey,
-      price: data.price,
+      price: data.price ?? 0,
       duration:data.duration,
       level: data.level,
       category:data.category as CourseSchemaType['category'],
@@ -158,15 +158,8 @@ export function EditCourseForm({data}: iAppProps) {
                         <FormMessage/>
                         </FormItem>
                 )}/>
-                <FormField control={form.control} name="duration" render={({ field }) => (
-                    <FormItem className='w-full'>
-                        <FormLabel>Duration (hours)</FormLabel>
-                        <FormControl>
-                            <Input placeholder='Duration' type='number' {...field}/>
-                        </FormControl>
-                        <FormMessage/>
-                        </FormItem>
-                )}/>
+                
+                {/*
                 <FormField control={form.control} name="price" render={({ field }) => (
                     <FormItem className='w-full'>
                         <FormLabel>Price</FormLabel>
@@ -176,7 +169,17 @@ export function EditCourseForm({data}: iAppProps) {
                         <FormMessage/>
                         </FormItem>
                 )}/>
+                */}
                </div>
+               <FormField control={form.control} name="duration" render={({ field }) => (
+                    <FormItem className='w-full'>
+                        <FormLabel>Duration (hours)</FormLabel>
+                        <FormControl>
+                            <Input placeholder='Duration' type='number' {...field}/>
+                        </FormControl>
+                        <FormMessage/>
+                        </FormItem>
+                )}/>
                <FormField control={form.control} name="status" render={({ field }) => (
                     <FormItem className='w-full'>
                         <FormLabel>Status</FormLabel>
