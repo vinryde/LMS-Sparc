@@ -6,7 +6,7 @@ import { ApiResponse } from "@/lib/type";
 import { requireAdmin } from "@/app/data/admin/require-admin";
 import arcjet, { fixedWindow } from '@/lib/arcjet';
 import {request} from '@arcjet/next';
-
+import { revalidatePath } from "next/cache";
 const aj = arcjet.withRule(
   fixedWindow({
     mode: "LIVE",
@@ -50,6 +50,7 @@ export async function CreateCourse(values: CourseSchemaType): Promise<ApiRespons
             userId:session?.user.id as string,
         }
     });
+    revalidatePath("/admin/courses");
     return{
         status: "success",
         message:"Course Created",

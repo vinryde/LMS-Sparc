@@ -57,6 +57,8 @@ export async function EditCourse(data: CourseSchemaType, courseId: string): Prom
             ...result.data,
         }
     }); 
+    revalidatePath(`/admin/courses/${courseId}`);
+    revalidatePath(`/admin/courses/`);
 
 return {
     status: "success",
@@ -176,6 +178,7 @@ export async function createChapter(values: ChapterSchemaType): Promise<ApiRespo
         });
       });
       revalidatePath(`/admin/courses/${result.data.courseId}/edit`);
+      
       return{
         status:'success',
         message:'Chapter created successfully.',
