@@ -44,7 +44,7 @@ export async function deleteCourse(courseId: string): Promise<ApiResponse> {
             },
         });
 
-        revalidatePath("/admin/courses");
+        revalidatePath("/courses");
         return {
             status: "success",
             message:"Course Deleted Successfully",

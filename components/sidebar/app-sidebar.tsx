@@ -55,8 +55,8 @@ const data = {
       icon: IconTextSpellcheck,
     },
     {
-      title: "Projects",
-      url: "#",
+      title: "Feedback",
+      url: "/admin/feedback",
       icon: IconFolder,
     },
     {
