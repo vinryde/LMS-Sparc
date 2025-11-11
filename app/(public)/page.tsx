@@ -44,7 +44,7 @@ export default function Home() {
                 Energy Education, Simplified!
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight ">
-            <span className="text-6xl md:text-8xl font-bold tracking-tight bg-gradient-to-br from-amber-300 to-gray-400 bg-clip-text text-transparent">CREATE</span> <br />
+            <span className="text-6xl md:text-8xl font-bold tracking-tight bg-gradient-to-br from-blue-300 to-gray-400 bg-clip-text text-transparent">CREATE</span> <br />
              
             </h1>
             <p className="lg:max-w-3xl md:max-w-lg text-muted-foreground md:text-xl">
@@ -71,7 +71,7 @@ export default function Home() {
         </div>
         
     </section>
-    <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-32 *:data-[slot=card]:from-primary/5 
+    <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-32 sm:px-6 md:px-0 *:data-[slot=card]:from-primary/5 
                    *:data-[slot=card]:to-card 
                    dark:*:data-[slot=card]:bg-card 
                    *:data-[slot=card]:bg-gradient-to-t 

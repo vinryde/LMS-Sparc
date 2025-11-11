@@ -16,9 +16,7 @@ export function PublicCourseCard({data}:iAppProps){
     const thumbnailUrl=useConstructUrl(data.fileKey)
     return(
         <Card className="group relative py-0 gap-0">
-            <Badge variant="default" className="absolute top-2 right-2 z-10">
-            {data.level}
-            </Badge>
+            
 
             <Image src={thumbnailUrl} alt={data.title} width={600} height={400} className="w-full rounded-t-xl aspect-video h-full object-cover"/>
             <CardContent className="p-4">

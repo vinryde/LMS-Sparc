@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
 import { IconBook, IconCategory, IconChartBar, IconChevronDown, IconClock, IconPlayerPlay } from "@tabler/icons-react";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, Lightbulb } from "lucide-react";
 import Image from "next/image";
 import { EnrollButton } from "@/app/(public)/courses/_components/EnrollButton";
 import { checkIfUserEnrolled } from "@/app/data/user/user-is-enrolled";
@@ -108,7 +108,7 @@ export default async function SlugPage({params}: {params: Params}) {
                                     <div className="p-6 pt-4 space-y-3"> {chapter.lesson.map((lesson,lessonIndex) => (
                                         <div key={lesson.id} className="flex items-center gap-4 rounded-lg p-3 hover:bg-accent transition-colors">
                                             <div className="flex size-8 items-center justify-center rounded-full bg-background border-2 border-primary/20">
-                                                <IconPlayerPlay className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                                                <Lightbulb className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
                                                  </div> 
                                                  <div className="flex-1">
                                                     <p className="font-medium text-sm">{lesson.title}</p>
@@ -142,9 +142,7 @@ export default async function SlugPage({params}: {params: Params}) {
 
                             
                             <div className="space-y-3 mb-6 rounded-lg bg-muted p-4">
-                                <h4 className="font-mediumm">
-                                    What you will get:
-                                </h4>
+                                
                                 <div className="flex flex-col gap-3">
                                     <div className="flex items-center gap-3">
                                         <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -160,19 +158,7 @@ export default async function SlugPage({params}: {params: Params}) {
                                         </div>
                                     </div>
                                    
-                                   <div className="flex items-center gap-3">
-                                        <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                                            <IconChartBar className="size-4" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium">
-                                                Difficulty Level
-                                            </p>
-                                            <p className="text-sm text-muted-foreground">
-                                                {course.level} 
-                                            </p>
-                                        </div>
-                                    </div>
+                                   
 
                                     <div className="flex items-center gap-3">
                                         <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -215,16 +201,25 @@ export default async function SlugPage({params}: {params: Params}) {
                               <ul className="space-y-2">
                                 <li className="flex items-center gap-2 text-sm">
                                     <div className="rounded-full bg-green-500/10 text-green-500 p-1">
-                                        <CheckIcon className="size-3" />
+                                        <Lightbulb className="size-3" />
                                     </div>
                                     <span>
-                                        Full Lifetime Access
+                                        Resources And Activities
                                     </span>
                                 </li>
 
                                 <li className="flex items-center gap-2 text-sm">
                                     <div className="rounded-full bg-green-500/10 text-green-500 p-1">
-                                        <CheckIcon className="size-3" />
+                                        <Lightbulb className="size-3" />
+                                    </div>
+                                    <span>
+                                        Interactive Quizzes
+                                    </span>
+                                </li>
+
+                                <li className="flex items-center gap-2 text-sm">
+                                    <div className="rounded-full bg-green-500/10 text-green-500 p-1">
+                                        <Lightbulb className="size-3" />
                                     </div>
                                     <span>
                                         Access on Mobile and Desktop
@@ -233,7 +228,7 @@ export default async function SlugPage({params}: {params: Params}) {
 
                                 <li className="flex items-center gap-2 text-sm">
                                     <div className="rounded-full bg-green-500/10 text-green-500 p-1">
-                                        <CheckIcon className="size-3" />
+                                        <Lightbulb className="size-3" />
                                     </div>
                                     <span>
                                         Certificate of Completion
