@@ -4,6 +4,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { Zap, SplinePointer, Earth,BookCheck } from 'lucide-react';
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { OrbHero } from "./_components/OrbHero";
+import { Web3HeroSection } from "@/components/web3-hero-section";
 interface featureProps {
   title: string;
   description: string;
@@ -38,10 +40,12 @@ export default function Home() {
 
   return (
     <>
-    <section className="relative py-20">
+    
+    <OrbHero />
+  {/*<section className="relative py-20">
         <div className="flex flex-col items-center text-center space-y-8 justify-center">
             <Badge variant={"outline"}>
-                Energy Education, Simplified!
+                Energy Education, Simplified!   
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight ">
             <span className="text-6xl md:text-8xl font-bold tracking-tight bg-gradient-to-br from-blue-300 to-gray-400 bg-clip-text text-transparent">CREATE</span> <br />
@@ -90,7 +94,7 @@ export default function Home() {
 
      ))}
 
-    </section>
+    </section>*/}
     </>
   );
 }
