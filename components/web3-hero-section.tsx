@@ -1,6 +1,9 @@
 import React from 'react';
 import { Button } from './ui/button';
-
+import { buttonVariants } from "@/components/ui/button";
+import Link from 'next/link';
+import {Lightbulb, Sun, Zap,Atom} from 'lucide-react'
+import { PointerHighlight } from '@/components/pointer-highlight';
 const GitIcon = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-auto text-gray-400">
         <path d="M18 6l-6 6-6-6" />
@@ -26,14 +29,14 @@ const JQueryIcon = () => (
 export function Web3HeroSection() {
     // Data for partner logos for easy management
     const partners = [
-        { name: "git", icon: <GitIcon /> },
-        { name: "npm", icon: <NpmIcon /> },
-        { name: "Lucidchart", text: "Lucidchart" },
-        { name: "wrike", text: "wrike" },
-        { name: "jQuery", icon: <JQueryIcon /> },
-        { name: "openstack", text: "openstack" },
-        { name: "servicenow", text: "servicenow" },
-        { name: "Paysafe:", text: "Paysafe:" }
+        { name: "Bulb", icon: <Lightbulb /> },
+        { name: "Sun", icon: <Sun /> },
+        { name: "Sustainability", text: "Sustainability" },
+        { name: "Renewables", text: "Renewables" },
+        { name: "Climate", text: "Climate Education" },
+        { name: "Energy", text: "Energy Awareness" },
+        { name: "Zap", icon: <Zap /> },
+        { name: "Atom", icon: <Atom /> }
     ];
 
     // CSS keyframes for our custom animations
@@ -66,14 +69,14 @@ export function Web3HeroSection() {
                         className="absolute w-full inset-0 h-full"
                         style={{
                             maskImage: `linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%),
-                                        linear-gradient(to right, black 0%, black 15%, transparent 25%, transparent 75%, black 85%, black 100%),
-                                        linear-gradient(to right, black 0%, black 25%, transparent 35%, transparent 65%, black 75%, black 100%),
+                                        linear-gradient(to right, black 20%, black 15%, transparent 25%, transparent 75%, black 85%, black 100%),
+                                        linear-gradient(to right, black 20%, black 25%, transparent 35%, transparent 65%, black 75%, black 100%),
                                         linear-gradient(to bottom, black 0%, black 25%, transparent 40%, transparent 60%, black 75%, black 100%)`,
                             maskComposite: 'intersect',
                         }}
                     >
                         {/* Color Gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-red-500 to-blue-600 opacity-90" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-red-500 to-blue-600 opacity-90" />
 
                         {/* 3D Perspective Grid */}
                         <div className="absolute inset-0" style={{ perspective: '1000px' }}>
@@ -101,34 +104,44 @@ export function Web3HeroSection() {
                         Energy Education, Simplified!
                     </div>
                     <h1 
-                        className="text-4xl md:text-6xl lg:text-7xl font-bold max-w-4xl leading-tight"
-                        style={{ animation: 'fade-in-up 0.8s ease-out 0.2s backwards' }}
+                        className="text-4xl md:text-6xl lg:text-8xl font-bold max-w-4xl leading-tight "
+                style={{ animation: 'fade-in-up 0.8s ease-out 0.2s backwards' }}
                     >
+                        <PointerHighlight>
                         CREATE
+                    </PointerHighlight>
                     </h1>
                     <p 
-                        className="text-muted-foreground mt-6 max-w-2xl text-lg md:text-xl"
+                        className="text-muted-foreground mt-6 xs:max-w-lg sm:max-w-md md:max-w-xl xs:text-md md:text-xl font-serif"
                         style={{ animation: 'fade-in-up 0.8s ease-out 0.4s backwards' }}
                     >
                     Energy Literacy for a Sustainable Future. We offer engaging, science-based modules that make energy literacy simple, practical, and inspiring.
                     </p>
-                    <Button 
-                        className="bg-white text-black font-semibold px-8 py-3 rounded-md mt-8 hover:bg-gray-200 transition-colors text-lg"
-                        style={{ animation: 'fade-in-up 0.8s ease-out 0.6s backwards' }}
-                    
-                    >
-                        Try Molibra
-                    </Button>
+                     <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-4 sm:mt-6">
+          <Link
+            className={buttonVariants({ size: "sm" }) + " sm:size-md md:size-xl"}
+            href="/courses"
+          >
+            Explore Courses
+          </Link>
+
+          <Link
+            className={buttonVariants({ size: "sm", variant: "outline" }) + " sm:size-md md:size-xl"}
+            href="/login"
+          >
+            Sign In
+          </Link>
+        </div>
                 </div>
 
                 {/* Footer Partners */}
                 <footer 
-                    className="absolute bottom-0 left-0 right-0 p-6 md:px-12 z-10"
+                    className="absolute bottom-15 md:bottom-10 left-0 right-0 p-6 md:px-12 z-10"
                     style={{ animation: 'fade-in 1s ease-out 1s backwards' }}
                 >
                     <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 text-gray-400">
                         {partners.map(partner => (
-                            <div key={partner.name} className="flex items-center gap-2 font-mono text-sm">
+                            <div key={partner.name} className="flex items-center gap-2 font-mono text-[10px] md:text-sm">
                                 {partner.icon ? partner.icon : <span>{partner.text}</span>}
                             </div>
                         ))}
