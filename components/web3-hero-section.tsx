@@ -104,7 +104,7 @@ export function Web3HeroSection() {
                         Energy Education, Simplified!
                     </div>
                     <h1 
-                        className="text-4xl md:text-6xl lg:text-8xl font-bold max-w-4xl leading-tight "
+                        className="text-5xl md:text-6xl lg:text-8xl font-bold max-w-4xl leading-tight "
                 style={{ animation: 'fade-in-up 0.8s ease-out 0.2s backwards' }}
                     >
                         <PointerHighlight>
@@ -112,7 +112,7 @@ export function Web3HeroSection() {
                     </PointerHighlight>
                     </h1>
                     <p 
-                        className="text-muted-foreground mt-6 xs:max-w-lg sm:max-w-md md:max-w-xl xs:text-md md:text-xl font-serif"
+                        className="text-muted-foreground mt-6 sm:max-w-sm md:max-w-xl xs:text-md md:text-xl font-serif"
                         style={{ animation: 'fade-in-up 0.8s ease-out 0.4s backwards' }}
                     >
                     Energy Literacy for a Sustainable Future. We offer engaging, science-based modules that make energy literacy simple, practical, and inspiring.
@@ -134,9 +134,9 @@ export function Web3HeroSection() {
         </div>
                 </div>
 
-                {/* Footer Partners */}
+                
                 <footer 
-                    className="absolute bottom-15 md:bottom-10 left-0 right-0 p-6 md:px-12 z-10"
+                    className="absolute bottom-10 md:bottom-10 left-0 right-0 p-6 md:px-12 z-10"
                     style={{ animation: 'fade-in 1s ease-out 1s backwards' }}
                 >
                     <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 text-gray-400">
