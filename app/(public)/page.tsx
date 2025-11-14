@@ -8,6 +8,7 @@ import { OrbHero } from "./_components/OrbHero";
 import { Web3HeroSection } from "@/components/web3-hero-section";
 import { PointerHighlight } from "@/components/pointer-highlight";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
+import { HomeFeatures } from "@/components/homefeatures";
 interface featureProps {
   title: string;
   description: string;
@@ -46,7 +47,7 @@ export default function Home() {
     <>
     <div className="px-0 space-y-8">
             <Web3HeroSection />
-            <div className="grid grid-cols-1 md:grid-cols-2 mt-16 gap-9">
+            <div className="grid grid-cols-1 md:grid-cols-2 mt-16 gap-9 md:mx-10 mx-0">
             <div className="px-4 mt-16 sm:max-w-4xl md:max-w-none space-y-6">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tighter ">How does <span><PointerHighlight>CREATE</PointerHighlight> </span> make a difference?</h1>
           <p className="text-lg md:text-xl text-neutral-600 dark:text-neutral-400">
@@ -60,6 +61,7 @@ export default function Home() {
             
           </div>
           </div>
+          <HomeFeatures />
       
     </div>
 
