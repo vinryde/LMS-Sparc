@@ -1,9 +1,25 @@
 'use client'
 import React, { useEffect, useRef, useState } from "react";
-import { Aperture, BarChart3, LayoutGrid, Activity, Layers } from "lucide-react";
+import { Aperture, BarChart3, LayoutGrid, Activity, Layers, LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "./ui/button";
 
+// Type definitions
+interface Feature {
+  title: string;
+  blurb: string;
+  meta: string;
+  icon: LucideIcon;
+  animation: string;
+}
+
+interface BentoItemProps {
+  feature: Feature;
+  span?: string;
+  theme?: string;
+  index?: number;
+  isVisible?: boolean;
+}
 
 const getRootTheme = () => {
   if (typeof document === "undefined") {
@@ -29,7 +45,7 @@ const getRootTheme = () => {
 function FeaturesSectionMinimal() {
   const [theme, setTheme] = useState(() => getRootTheme());
   const [sectionVisible, setSectionVisible] = useState(false);
-  const sectionRef = useRef(null);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -150,7 +166,7 @@ function FeaturesSectionMinimal() {
     }
   };
 
-  const features = [
+  const features: Feature[] = [
     {
       title: "Why Energy Literacy Matters?",
       blurb: "Energy literacy equips learners with essential knowledge of energy systems, enabling them to evaluate consumption patterns, embrace renewable technologies, and reduce environmental impact. Through our carefully designed and high-quality modules, we provide the best learning pathways to promote strong energy literacy. This foundation fosters informed decision-making, strengthens climate resilience, and empowers communities to participate actively in building a sustainable, low-carbon future.",
@@ -160,29 +176,29 @@ function FeaturesSectionMinimal() {
     },
     {
       title: "Resource-Rich Content",
-    blurb: "Each module includes curated readings, visuals, and tools to support comprehensive learning of energy topics.",
-    meta: "Resources",
+      blurb: "Each module includes curated readings, visuals, and tools to support comprehensive learning of energy topics.",
+      meta: "Resources",
       icon: BarChart3,
       animation: "bento2-pulse 4s ease-in-out infinite",
     },
     {
       title: "Feedback Sessions",
-    blurb: "Interactive feedback sessions guide learners toward deeper comprehension and improved performance.",
-    meta: "Support",
+      blurb: "Interactive feedback sessions guide learners toward deeper comprehension and improved performance.",
+      meta: "Support",
       icon: LayoutGrid,
       animation: "bento2-tilt 5.5s ease-in-out infinite",
     },
     {
       title: "Activity-Based Learning",
-     blurb: "Replaces traditional instruction with practical, experience-driven tasks that strengthen real-world understanding of energy systems and literacy.",
-     meta: "Learning",
+      blurb: "Replaces traditional instruction with practical, experience-driven tasks that strengthen real-world understanding of energy systems and literacy.",
+      meta: "Learning",
       icon: Activity,
       animation: "bento2-drift 8s ease-in-out infinite",
     },
     {
       title: "Interactive Modules",
-    blurb: "Engaging quizzes, assessments, and hands-on activities create dynamic pathways for mastering core energy concepts effectively.",
-    meta: "Engagement",
+      blurb: "Engaging quizzes, assessments, and hands-on activities create dynamic pathways for mastering core energy concepts effectively.",
+      meta: "Engagement",
       icon: Layers,
       animation: "bento2-glow 7s ease-in-out infinite",
     },
@@ -201,35 +217,12 @@ function FeaturesSectionMinimal() {
       <div className="absolute inset-0 -z-30 overflow-hidden">
         <div
           className="absolute inset-0 [--aurora-base:#ffffff] [--aurora-accent:rgba(148,163,184,0.15)] dark:[--aurora-base:#040404] dark:[--aurora-accent:rgba(59,130,246,0.15)]"
-          /*style={{
-            background:
-              "radial-gradient(ellipse 55% 100% at 12% 0%, var(--aurora-accent), transparent 65%), radial-gradient(ellipse 40% 80% at 88% 0%, rgba(148,163,184,0.1), transparent 70%), var(--aurora-base)",
-          }}*/
         />
         <div
           className="absolute inset-0  [--grid-color:rgba(17,17,17,0.08)] dark:[--grid-color:rgba(255,255,255,0.06)]"
-         /* style={{
-            backgroundImage:
-              "linear-gradient(to right, var(--grid-color) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px)",
-            backgroundSize: "20px 20px",
-            backgroundPosition: "0 0, 0 0",
-            maskImage:
-              "repeating-linear-gradient(to right, black 0px, black 3px, transparent 3px, transparent 8px), repeating-linear-gradient(to bottom, black 0px, black 3px, transparent 3px, transparent 8px)",
-            WebkitMaskImage:
-              "repeating-linear-gradient(to right, black 0px, black 3px, transparent 3px, transparent 8px), repeating-linear-gradient(to bottom, black 0px, black 3px, transparent 3px, transparent 8px)",
-            maskComposite: "intersect",
-            WebkitMaskComposite: "source-in",
-            opacity: 0.9,
-          }}*/
         />
         <div
           className="pointer-events-none absolute inset-0 [--edge-color:rgba(255,255,255,1)] dark:[--edge-color:rgba(0,0,0,1)]"
-         /* backg style={{
-            background:
-              "radial-gradient(circle at center, rgba(0,0,0,0) 55%, var(--edge-color) 100%)",
-            filter: "blur(40px)",
-            opacity: 0.75,
-          }}*/
         />
       </div>
 
@@ -285,7 +278,7 @@ function FeaturesSectionMinimal() {
   );
 }
 
-function BentoItem({ feature, span = "", theme = "light", index = 0, isVisible = false }) {
+function BentoItem({ feature, span = "", theme = "light", index = 0, isVisible = false }: BentoItemProps) {
   const { icon: Icon, animation, title, blurb, meta } = feature;
   const gradientFill =
     theme === "dark"
@@ -350,4 +343,3 @@ function BentoItem({ feature, span = "", theme = "light", index = 0, isVisible =
 
 export default FeaturesSectionMinimal;
 export { FeaturesSectionMinimal };
-

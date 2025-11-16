@@ -1,8 +1,25 @@
 'use client'
 import React, { useEffect, useRef, useState } from "react";
-import { Aperture, BarChart3, LayoutGrid, Activity, Layers } from "lucide-react";
+import { Aperture, BarChart3, LayoutGrid, Activity, Layers, LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "./ui/button";
+
+// Type definitions
+interface Feature {
+  title: string;
+  blurb: string;
+  meta: string;
+  icon: LucideIcon;
+  animation: string;
+}
+
+interface BentoItemProps {
+  feature: Feature;
+  span?: string;
+  theme?: string;
+  index?: number;
+  isVisible?: boolean;
+}
 
 const getRootTheme = () => {
   if (typeof document === "undefined") {
@@ -28,7 +45,7 @@ const getRootTheme = () => {
 function FeaturesSectionMinimalClimate() {
   const [theme, setTheme] = useState(() => getRootTheme());
   const [sectionVisible, setSectionVisible] = useState(false);
-  const sectionRef = useRef(null);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -149,39 +166,39 @@ function FeaturesSectionMinimalClimate() {
     }
   };
 
-  const features = [
+  const features: Feature[] = [
     {
       title: "Climate Science for a Sustainable Future",
-      blurb: "Climate science helps learners understand Earth’s systems, human impacts, and the urgent need for climate action. Through scientific inquiry and real-world applications, learners develop critical thinking, resilience, and the capacity to support adaptation, mitigation, and sustainable environmental decision-making.",
+      blurb: "Climate science helps learners understand Earth's systems, human impacts, and the urgent need for climate action. Through scientific inquiry and real-world applications, learners develop critical thinking, resilience, and the capacity to support adaptation, mitigation, and sustainable environmental decision-making.",
       meta: "Climate Science",
       icon: Aperture,
       animation: "bento2-float 6s ease-in-out infinite",
     },
     {
       title: "Resources",
-    blurb: "Provides comprehensive climate materials, curated scientific readings, and tools to deepen understanding of environmental change.",
-    meta: "Resources",
+      blurb: "Provides comprehensive climate materials, curated scientific readings, and tools to deepen understanding of environmental change.",
+      meta: "Resources",
       icon: BarChart3,
       animation: "bento2-pulse 4s ease-in-out infinite",
     },
     {
       title: "Global Perspectives",
-    blurb: "Explores worldwide climate challenges and solutions, helping learners understand diverse environmental contexts and global responsibilities.",
-    meta: "Global",
+      blurb: "Explores worldwide climate challenges and solutions, helping learners understand diverse environmental contexts and global responsibilities.",
+      meta: "Global",
       icon: LayoutGrid,
       animation: "bento2-tilt 5.5s ease-in-out infinite",
     },
     {
       title: "Scientific Foundations",
-     blurb: "Learners explore climate systems, atmospheric processes, and scientific methods to understand Earth’s changing environment.",
-     meta: "Learning",
+      blurb: "Learners explore climate systems, atmospheric processes, and scientific methods to understand Earth's changing environment.",
+      meta: "Learning",
       icon: Activity,
       animation: "bento2-drift 8s ease-in-out infinite",
     },
     {
       title: "Impact Exploration",
-    blurb: "Engaging activities reveal climate change effects on ecosystems, communities, and global systems with real-world relevance.",
-    meta: "Engagement",
+      blurb: "Engaging activities reveal climate change effects on ecosystems, communities, and global systems with real-world relevance.",
+      meta: "Engagement",
       icon: Layers,
       animation: "bento2-glow 7s ease-in-out infinite",
     },
@@ -201,35 +218,12 @@ function FeaturesSectionMinimalClimate() {
       <div className="absolute inset-0 -z-30 overflow-hidden">
         <div
           className="absolute inset-0 [--aurora-base:#ffffff] [--aurora-accent:rgba(148,163,184,0.15)] dark:[--aurora-base:#040404] dark:[--aurora-accent:rgba(59,130,246,0.15)]"
-          /*style={{
-            background:
-              "radial-gradient(ellipse 55% 100% at 12% 0%, var(--aurora-accent), transparent 65%), radial-gradient(ellipse 40% 80% at 88% 0%, rgba(148,163,184,0.1), transparent 70%), var(--aurora-base)",
-          }}*/
         />
         <div
           className="absolute inset-0  [--grid-color:rgba(17,17,17,0.08)] dark:[--grid-color:rgba(255,255,255,0.06)]"
-         /* style={{
-            backgroundImage:
-              "linear-gradient(to right, var(--grid-color) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px)",
-            backgroundSize: "20px 20px",
-            backgroundPosition: "0 0, 0 0",
-            maskImage:
-              "repeating-linear-gradient(to right, black 0px, black 3px, transparent 3px, transparent 8px), repeating-linear-gradient(to bottom, black 0px, black 3px, transparent 3px, transparent 8px)",
-            WebkitMaskImage:
-              "repeating-linear-gradient(to right, black 0px, black 3px, transparent 3px, transparent 8px), repeating-linear-gradient(to bottom, black 0px, black 3px, transparent 3px, transparent 8px)",
-            maskComposite: "intersect",
-            WebkitMaskComposite: "source-in",
-            opacity: 0.9,
-          }}*/
         />
         <div
           className="pointer-events-none absolute inset-0 [--edge-color:rgba(255,255,255,1)] dark:[--edge-color:rgba(0,0,0,1)]"
-         /* backg style={{
-            background:
-              "radial-gradient(circle at center, rgba(0,0,0,0) 55%, var(--edge-color) 100%)",
-            filter: "blur(40px)",
-            opacity: 0.75,
-          }}*/
         />
       </div>
 
@@ -285,7 +279,7 @@ function FeaturesSectionMinimalClimate() {
   );
 }
 
-function BentoItem({ feature, span = "", theme = "light", index = 0, isVisible = false }) {
+function BentoItem({ feature, span = "", theme = "light", index = 0, isVisible = false }: BentoItemProps) {
   const { icon: Icon, animation, title, blurb, meta } = feature;
   const gradientFill =
     theme === "dark"
@@ -350,4 +344,3 @@ function BentoItem({ feature, span = "", theme = "light", index = 0, isVisible =
 
 export default FeaturesSectionMinimalClimate;
 export { FeaturesSectionMinimalClimate };
-
