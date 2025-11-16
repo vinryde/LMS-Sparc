@@ -9,6 +9,9 @@ import { Web3HeroSection } from "@/components/web3-hero-section";
 import { PointerHighlight } from "@/components/pointer-highlight";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { HomeFeatures } from "@/components/homefeatures";
+import FeaturesSectionMinimal from "@/components/bento-monochrome";
+import FeaturesSectionMinimalClimate from "@/components/bento-climate";
+import ScrollingHeroMarquee from "@/components/scrolling-hero-marquee";
 interface featureProps {
   title: string;
   description: string;
@@ -62,6 +65,16 @@ export default function Home() {
           </div>
           </div>
           <HomeFeatures />
+          <FeaturesSectionMinimal/>
+          <div className="mx-4">
+          <ScrollingHeroMarquee
+        text="Save energy, save the future. Small changes create big impact. Be energy smart, embrace efficiency, choose renewables, and turn off unnecessary lights to protect the future and build responsible, sustainable communities."
+        durationSec={15}
+        rowHeight={200}
+        fontSize="clamp(2rem, 6vw, 4rem)"       
+      />
+      </div>
+          <FeaturesSectionMinimalClimate/>
       
     </div>
 

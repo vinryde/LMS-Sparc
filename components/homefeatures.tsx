@@ -42,10 +42,10 @@ export function HomeFeatures() {
 		<section className="py-16 md:py-32">
 			<div className="mx-auto w-full max-w-7xl space-y-8 px-4">
 				<AnimatedContainer className="mx-auto max-w-5xl text-center">
-					<h2 className="text-3xl font-bold tracking-wide text-balance md:text-4xl lg:text-5xl xl:font-bold">
+					<h2 className="text-3xl font-bold  text-balance md:text-4xl lg:text-5xl xl:font-bold">
 						Educating for Sustainable Futures
 					</h2>
-					<p className="text-muted-foreground mt-4 text-sm tracking-wide text-balance md:text-base ">
+					<p className="text-muted-foreground mt-4 text-sm  text-balance md:text-base ">
 					Empowering learners with energy education and climate action skills to build resilient, sustainable, and environmentally conscious communities.
 					</p>
 				</AnimatedContainer>
