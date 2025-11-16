@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useRef, useState } from "react";
-import { Aperture, BarChart3, LayoutGrid, Activity, Layers, LucideIcon } from "lucide-react";
+import {  Activity, Layers, LucideIcon,Atom, LibraryBig,MessagesSquare } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "./ui/button";
 
@@ -171,21 +171,21 @@ function FeaturesSectionMinimal() {
       title: "Why Energy Literacy Matters?",
       blurb: "Energy literacy equips learners with essential knowledge of energy systems, enabling them to evaluate consumption patterns, embrace renewable technologies, and reduce environmental impact. Through our carefully designed and high-quality modules, we provide the best learning pathways to promote strong energy literacy. This foundation fosters informed decision-making, strengthens climate resilience, and empowers communities to participate actively in building a sustainable, low-carbon future.",
       meta: "Energy Literacy",
-      icon: Aperture,
+      icon: Atom,
       animation: "bento2-float 6s ease-in-out infinite",
     },
     {
       title: "Resource-Rich Content",
       blurb: "Each module includes curated readings, visuals, and tools to support comprehensive learning of energy topics.",
       meta: "Resources",
-      icon: BarChart3,
+      icon: LibraryBig,
       animation: "bento2-pulse 4s ease-in-out infinite",
     },
     {
       title: "Feedback Sessions",
       blurb: "Interactive feedback sessions guide learners toward deeper comprehension and improved performance.",
       meta: "Support",
-      icon: LayoutGrid,
+      icon: MessagesSquare,
       animation: "bento2-tilt 5.5s ease-in-out infinite",
     },
     {

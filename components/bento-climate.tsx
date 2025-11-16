@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useRef, useState } from "react";
-import { Aperture, BarChart3, LayoutGrid, Activity, Layers, LucideIcon } from "lucide-react";
+import { LucideIcon,CloudSun,BookKey,Globe,Satellite,ArrowRightLeft } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "./ui/button";
 
@@ -171,35 +171,35 @@ function FeaturesSectionMinimalClimate() {
       title: "Climate Science for a Sustainable Future",
       blurb: "Climate science helps learners understand Earth's systems, human impacts, and the urgent need for climate action. Through scientific inquiry and real-world applications, learners develop critical thinking, resilience, and the capacity to support adaptation, mitigation, and sustainable environmental decision-making.",
       meta: "Climate Science",
-      icon: Aperture,
+      icon: CloudSun,
       animation: "bento2-float 6s ease-in-out infinite",
     },
     {
       title: "Resources",
       blurb: "Provides comprehensive climate materials, curated scientific readings, and tools to deepen understanding of environmental change.",
       meta: "Resources",
-      icon: BarChart3,
+      icon: BookKey,
       animation: "bento2-pulse 4s ease-in-out infinite",
     },
     {
       title: "Global Perspectives",
       blurb: "Explores worldwide climate challenges and solutions, helping learners understand diverse environmental contexts and global responsibilities.",
       meta: "Global",
-      icon: LayoutGrid,
+      icon: Globe,
       animation: "bento2-tilt 5.5s ease-in-out infinite",
     },
     {
       title: "Scientific Foundations",
       blurb: "Learners explore climate systems, atmospheric processes, and scientific methods to understand Earth's changing environment.",
       meta: "Learning",
-      icon: Activity,
+      icon: Satellite,
       animation: "bento2-drift 8s ease-in-out infinite",
     },
     {
       title: "Impact Exploration",
       blurb: "Engaging activities reveal climate change effects on ecosystems, communities, and global systems with real-world relevance.",
       meta: "Engagement",
-      icon: Layers,
+      icon: ArrowRightLeft,
       animation: "bento2-glow 7s ease-in-out infinite",
     },
   ];

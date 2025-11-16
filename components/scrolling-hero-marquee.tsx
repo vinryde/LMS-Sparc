@@ -44,7 +44,7 @@ export default function ScrollingHeroMarquee({
 }: ScrollingHeroMarqueeProps) {
   return (
     <section
-      className={`flex min-h-screen flex-col justify-center p-8 ${className}`}
+      className={`flex min-h-screen flex-col justify-center overflow-x-hidden p-8 ${className}`}
       style={{ perspective: `${perspectivePx}px` }}
       aria-label="Hero marquee"
     >
