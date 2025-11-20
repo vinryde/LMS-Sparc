@@ -2,16 +2,14 @@ import { requireAdmin } from "@/app/data/admin/require-admin";
 import { prisma } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
-type Params = Promise<{ assessmentId: string }>;
-
 export async function GET(
   request: NextRequest,
-  { params }: { params: Params }
+  context: { params: Promise<{ assessmentId: string }> }
 ) {
   try {
     await requireAdmin();
     
-    const { assessmentId } = await params;
+    const { assessmentId } = await context.params;
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
