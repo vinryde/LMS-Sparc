@@ -125,6 +125,7 @@ export async function getStudentFeedbackData(
         return {
           userId: user.id,
           userName: user.name || user.email?.split("@")[0] || "Unknown",
+          userEmail: user.email,
           feedback: feedbackSubmission || null,
           quizSubmission: quizSubmission || null,
           latestSubmission: new Date(latestSubmission),

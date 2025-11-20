@@ -92,8 +92,8 @@ export function LessonFeedbackContent({
               </div>
               <div className="flex-1">
                 <CardTitle>{student.userName}</CardTitle>
-                <CardDescription>
-                  See {student.userName.split(" ")[0]}'s info
+                <CardDescription className="mt-2">
+                  Email: {student.userEmail}
                 </CardDescription>
               </div>
               <Badge variant="outline" className="text-xs">
