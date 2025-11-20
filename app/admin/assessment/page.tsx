@@ -1,10 +1,9 @@
 import { adminGetAllAssessments } from "@/app/data/admin/admin-get-assessment";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/general/EmptyState";
 import Link from "next/link";
-import { BookCheck, Users, GraduationCap } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { BookCheck, Users, GraduationCap, ClipboardList } from "lucide-react";
 
 export default async function AssessmentsPage() {
   const assessments = await adminGetAllAssessments();
@@ -71,6 +70,13 @@ export default async function AssessmentsPage() {
                     className={buttonVariants({ variant: "default", className: "flex-1" })}
                   >
                     Edit Assessment
+                  </Link>
+                  <Link
+                    href={`/admin/assessment/results/${assessment.id}`}
+                    className={buttonVariants({ variant: "outline", className: "flex-1" })}
+                  >
+                    <ClipboardList className="size-4 mr-2" />
+                    Assessment Results
                   </Link>
                 </div>
               </CardContent>
