@@ -181,12 +181,12 @@ export async function createChapter(values: ChapterSchemaType): Promise<ApiRespo
       
       return{
         status:'success',
-        message:'Chapter created successfully.',
+        message:'Module created successfully.',
       }
     }catch{
         return{
             status: "error",
-            message:"Failed to create chapter.",
+            message:"Failed to create module.",
         };
     }
 }
@@ -229,12 +229,12 @@ export async function createLesson(values: LessonSchemaType): Promise<ApiRespons
       revalidatePath(`/admin/courses/${result.data.courseId}/edit`);
       return{
         status:'success',
-        message:'Lesson created successfully.',
+        message:'Capsule created successfully.',
       }
     }catch{
         return{
             status: "error",
-            message:"Failed to create lesson.",
+            message:"Failed to create Capsule.",
         };
     }
 }
@@ -269,7 +269,7 @@ const chapterWithLessons = await prisma.chapter.findUnique ({
 if(!chapterWithLessons){
     return{
         status:'error',
-        message:'Chapter not found.',
+        message:'Module not found.',
     }
 }
 
@@ -279,7 +279,7 @@ const lessonToDelete = lessons.find((lesson) => lesson.id === lessonId);
 if(!lessonToDelete){
     return{
         status:'error',
-        message:'Lesson not found in the chapter.',
+        message:'Capsule not found in the module.',
     };
 }
 
@@ -301,12 +301,12 @@ await prisma.$transaction([
  revalidatePath(`/admin/courses/${courseId}/edit`);
  return{
         status:'success',
-        message:'Lesson deleted successfully.',
+        message:'Capsule deleted successfully.',
  }
     } catch {
         return{
             status: "error",
-            message:"Failed to delete lesson.",
+            message:"Failed to delete Capsule.",
         };
     }
 }
@@ -349,7 +349,7 @@ const chapterToDelete = chapters.find((chapter) => chapter.id === chapterId);
 if(!chapterToDelete){
     return{
         status:'error',
-        message:'Chapter not found in the course.',
+        message:'Module not found in the course.',
     };
 }
 
@@ -371,12 +371,12 @@ await prisma.$transaction([
  revalidatePath(`/admin/courses/${courseId}/edit`);
  return{
         status:'success',
-        message:'Chapter deleted successfully.',
+        message:'Module deleted successfully.',
  }
     } catch {
         return{
             status: "error",
-            message:"Failed to delete chapter.",
+            message:"Failed to delete module.",
         };
     }
 }

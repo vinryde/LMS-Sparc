@@ -227,7 +227,7 @@ function toggleChapter(chapterId: string){
         <DndContext collisionDetection={rectIntersection} onDragEnd={handleDragEnd} sensors={sensors}>
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between border-b border-border">
-                    <CardTitle>Chapters</CardTitle>
+                    <CardTitle>Modules</CardTitle>
                     <NewChapterModel courseId={data.id}/>
                 </CardHeader>
                 <CardContent className="space-y-8">

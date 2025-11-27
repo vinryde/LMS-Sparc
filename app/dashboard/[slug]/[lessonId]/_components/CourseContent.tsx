@@ -36,7 +36,7 @@ if(!videoKey){
     return(
     <div className="aspect-video bg-muted rounded-lg flex flex-col items-center justify-center">
         <BookIcon className="size-16 text-primary mx-auto mb-4"/>
-        <p className="text-center text-sm text-muted-foreground">This lesson does not have a video yet</p>
+        <p className="text-center text-sm text-muted-foreground">This capsule does not have a video yet</p>
     </div>
     )
 }

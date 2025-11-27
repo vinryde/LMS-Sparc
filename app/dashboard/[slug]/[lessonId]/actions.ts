@@ -162,7 +162,7 @@ export async function markLessonComplete(lessonId:string,slug:string):Promise<Ap
     catch{
        return{
         status:"error",
-        message:"Failed to mark lesson complete"
+        message:"Failed to mark complete"
        } 
     }
 
@@ -189,7 +189,7 @@ export async function submitFeedback(
     if (existingSubmission) {
       return {
         status: "error",
-        message: "You have already submitted feedback for this lesson",
+        message: "You have already submitted feedback for this capsule",
       };
     }
 

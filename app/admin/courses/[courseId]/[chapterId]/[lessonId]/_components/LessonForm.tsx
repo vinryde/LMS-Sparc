@@ -112,16 +112,16 @@ export function LessonForm({ chapterId, data, courseId }: iAppProps) {
       {/* ================= LESSON FORM ================= */}
       <Card>
         <CardHeader>
-          <CardTitle>Lesson Configuration</CardTitle>
-          <CardDescription>Configure the video and description for this lesson.</CardDescription>
+          <CardTitle>Capsule Configuration</CardTitle>
+          <CardDescription>Configure the contents for this Capsule.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField control={form.control} name="name" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Lesson Name</FormLabel>
-                  <FormControl><Input placeholder="Lesson Name" {...field} /></FormControl>
+                  <FormLabel>Capsule Name</FormLabel>
+                  <FormControl><Input placeholder="Capsule Name" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
@@ -159,7 +159,7 @@ export function LessonForm({ chapterId, data, courseId }: iAppProps) {
               )} />
 
               <Button disabled={pending} type="submit">
-                {pending ? "Saving..." : "Save Lesson"}
+                {pending ? "Saving..." : "Save Capsule"}
               </Button>
             </form>
           </Form>
@@ -218,7 +218,7 @@ export function LessonForm({ chapterId, data, courseId }: iAppProps) {
       <Card>
         <CardHeader>
           <CardTitle>Student Feedback (Optional)</CardTitle>
-          <CardDescription>Collect feedback to improve lesson content</CardDescription>
+          <CardDescription>Collect feedback for Capsule content</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoadingFeedback ? (

@@ -56,14 +56,14 @@ export function NewLessonModel({courseId,chapterId}: { courseId: string ,chapter
         <DialogTrigger asChild>
             <Button variant="outline" className="w-full justify-center gap-1">
               <Plus className="size-4"/>
-              New Lesson
+              New Capsule
             </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-                <DialogTitle>Create a new lesson</DialogTitle>
+                <DialogTitle>Create a new capsule</DialogTitle>
                 <DialogDescription>
-                    Name your new lesson
+                    Name your new capsule
                 </DialogDescription>
             </DialogHeader>
             <Form {...form}>
@@ -72,14 +72,14 @@ export function NewLessonModel({courseId,chapterId}: { courseId: string ,chapter
                     <FormItem>
                         <FormLabel>Name</FormLabel>
                         <FormControl>
-                            <Input placeholder="Lesson Name" {...field}/>
+                            <Input placeholder="Capsule Name" {...field}/>
                         </FormControl>
                         <FormMessage />
                     </FormItem>
                   )}/>
                   <DialogFooter>
                     <Button disabled={pending} type="submit">
-                        {pending ? 'Creating...' : 'Create Lesson'}
+                        {pending ? 'Creating...' : 'Create Capsule'}
                     </Button>
                   </DialogFooter>
                 </form>

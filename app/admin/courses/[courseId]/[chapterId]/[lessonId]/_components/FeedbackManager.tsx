@@ -191,7 +191,7 @@ export function FeedbackManager({ lessonId, initialFeedback, onFeedbackUpdate }:
           <div className="p-4 bg-muted rounded-lg space-y-2">
             <p className="text-sm font-medium">Feedback Statistics</p>
             <p className="text-sm text-muted-foreground">
-              {initialFeedback._count.submissions} student{initialFeedback._count.submissions !== 1 ? 's have' : ' has'} submitted feedback for this lesson
+              {initialFeedback._count.submissions} student{initialFeedback._count.submissions !== 1 ? 's have' : ' has'} submitted feedback for this capsule
             </p>
           </div>
         )}

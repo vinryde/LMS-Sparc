@@ -51,14 +51,14 @@ export function NewChapterModel({courseId}: { courseId: string }){
         <DialogTrigger asChild>
             <Button variant="outline" size="sm" className="gap-2">
               <Plus className="size-4"/>
-              New Chapter
+              New Module
             </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-                <DialogTitle>Create a new chapter</DialogTitle>
+                <DialogTitle>Create a new module</DialogTitle>
                 <DialogDescription>
-                    Name your new chapter
+                    Name your new module
                 </DialogDescription>
             </DialogHeader>
             <Form {...form}>
@@ -67,14 +67,14 @@ export function NewChapterModel({courseId}: { courseId: string }){
                     <FormItem>
                         <FormLabel>Name</FormLabel>
                         <FormControl>
-                            <Input placeholder="Chapter Name" {...field}/>
+                            <Input placeholder="Module Name" {...field}/>
                         </FormControl>
                         <FormMessage />
                     </FormItem>
                   )}/>
                   <DialogFooter>
                     <Button disabled={pending} type="submit">
-                        {pending ? 'Creating...' : 'Create Chapter'}
+                        {pending ? 'Creating...' : 'Create Module'}
                     </Button>
                   </DialogFooter>
                 </form>
