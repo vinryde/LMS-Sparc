@@ -146,6 +146,43 @@ export const reorderResourcesSchema = z.object({
     position: z.number(),
   })),
 });
+export const activitySchema = z.object({
+  title: z.string().min(3, {message: "Title must be at least 3 characters long"}),
+  shortDescription: z.string().max(200, {message: "Short description must be under 200 characters"}).optional(),
+  description: z.string().min(10, {message: "Description must be at least 10 characters long"}),
+  lessonId: z.string().uuid({message: "Invalid lesson id"}),
+});
+
+export const activityResourceSchema = z.object({
+  title: z.string().min(3, {message: "Title must be at least 3 characters long"}),
+  type: z.enum(resourceTypes, {message: "Resource type is required"}),
+  activityId: z.string().uuid({message: "Invalid activity id"}),
+  textContent: z.string().optional(),
+  linkUrl: z.string().url({message: "Invalid URL"}).optional(),
+  imageKey: z.string().optional(),
+  documentKey: z.string().optional(),
+});
+
+export const reorderActivitiesSchema = z.object({
+  lessonId: z.string().uuid(),
+  activities: z.array(z.object({
+    id: z.string().uuid(),
+    position: z.number(),
+  })),
+});
+
+export const reorderActivityResourcesSchema = z.object({
+  activityId: z.string().uuid(),
+  resources: z.array(z.object({
+    id: z.string().uuid(),
+    position: z.number(),
+  })),
+});
+
+export type ActivitySchemaType = z.infer<typeof activitySchema>;
+export type ActivityResourceSchemaType = z.infer<typeof activityResourceSchema>;
+export type ReorderActivitiesSchemaType = z.infer<typeof reorderActivitiesSchema>;
+export type ReorderActivityResourcesSchemaType = z.infer<typeof reorderActivityResourcesSchema>;
 
 export type ResourceSchemaType = z.infer<typeof resourceSchema>;
 export type ReorderResourcesSchemaType = z.infer<typeof reorderResourcesSchema>;

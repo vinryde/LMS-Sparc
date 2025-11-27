@@ -8,7 +8,7 @@ import { lessonSchema, LessonSchemaType, quizSchema,
   reorderQuestionsSchema,
   QuizSchemaType,
   QuestionSchemaType,
-  ReorderQuestionsSchemaType, feedbackSchema, type FeedbackSchemaType,resourceSchema, reorderResourcesSchema, type ResourceSchemaType, type ReorderResourcesSchemaType } from "@/lib/zodSchema";
+  ReorderQuestionsSchemaType, feedbackSchema,activitySchema,reorderActivitiesSchema,activityResourceSchema,reorderActivityResourcesSchema, type FeedbackSchemaType,resourceSchema, reorderResourcesSchema, type ResourceSchemaType, type ReorderResourcesSchemaType, type ActivitySchemaType, type ReorderActivitiesSchemaType, type ActivityResourceSchemaType, type ReorderActivityResourcesSchemaType } from "@/lib/zodSchema";
 
 import { revalidatePath } from "next/cache";
 
@@ -823,6 +823,536 @@ export async function reorderResources(
       status: "error",
       message: "Failed to reorder resources",
     };
+  }
+}
+// Activity Actions
+export async function createActivity(
+  values: ActivitySchemaType
+): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const result = activitySchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid data",
+      };
+    }
+
+    // Get max position
+    const maxPos = await prisma.activity.findFirst({
+      where: {
+        lessonId: result.data.lessonId,
+      },
+      select: {
+        position: true,
+      },
+      orderBy: {
+        position: 'desc',
+      },
+    });
+
+    // Create activity
+    await prisma.activity.create({
+      data: {
+        title: result.data.title,
+        shortDescription: result.data.shortDescription,
+        description: result.data.description,
+        lessonId: result.data.lessonId,
+        position: (maxPos?.position ?? 0) + 1,
+      },
+    });
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: "success",
+      message: "Activity created successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to create activity",
+    };
+  }
+}
+
+export async function updateActivity(
+  values: ActivitySchemaType,
+  activityId: string
+): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const result = activitySchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid data",
+      };
+    }
+
+    await prisma.activity.update({
+      where: {
+        id: activityId,
+      },
+      data: {
+        title: result.data.title,
+        shortDescription: result.data.shortDescription,
+        description: result.data.description,
+      },
+    });
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: "success",
+      message: "Activity updated successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to update activity",
+    };
+  }
+}
+
+export async function deleteActivity({
+  activityId,
+  lessonId,
+}: {
+  activityId: string;
+  lessonId: string;
+}): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const lessonWithActivities = await prisma.lesson.findUnique({
+      where: {
+        id: lessonId,
+      },
+      select: {
+        activities: {
+          orderBy: {
+            position: 'asc',
+          },
+          select: {
+            id: true,
+            position: true,
+          },
+        },
+      },
+    });
+
+    if (!lessonWithActivities) {
+      return {
+        status: 'error',
+        message: 'Lesson not found.',
+      };
+    }
+
+    const activities = lessonWithActivities.activities;
+    const activityToDelete = activities.find((a) => a.id === activityId);
+
+    if (!activityToDelete) {
+      return {
+        status: 'error',
+        message: 'Activity not found.',
+      };
+    }
+
+    const remainingActivities = activities.filter((a) => a.id !== activityId);
+    const updates = remainingActivities.map((activity, index) =>
+      prisma.activity.update({
+        where: { id: activity.id },
+        data: { position: index + 1 },
+      })
+    );
+
+    await prisma.$transaction([
+      ...updates,
+      prisma.activity.delete({
+        where: { id: activityId },
+      }),
+    ]);
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: 'success',
+      message: 'Activity deleted successfully.',
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to delete activity.",
+    };
+  }
+}
+
+export async function reorderActivities(
+  values: ReorderActivitiesSchemaType
+): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const result = reorderActivitiesSchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid data",
+      };
+    }
+
+    const updates = result.data.activities.map((activity) =>
+      prisma.activity.update({
+        where: {
+          id: activity.id,
+        },
+        data: {
+          position: activity.position,
+        },
+      })
+    );
+
+    await prisma.$transaction(updates);
+    revalidatePath(`/admin/courses`);
+
+    return {
+      status: "success",
+      message: "Activities reordered successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to reorder activities",
+    };
+  }
+}
+
+// Activity Resource Actions
+export async function createActivityResource(
+  values: ActivityResourceSchemaType
+): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const result = activityResourceSchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid data",
+      };
+    }
+
+    // Validate required fields for resource type
+    if (result.data.type === "TEXT" && !result.data.textContent) {
+      return {
+        status: "error",
+        message: "Text content is required for TEXT resources",
+      };
+    }
+    if (result.data.type === "LINK" && !result.data.linkUrl) {
+      return {
+        status: "error",
+        message: "Link URL is required for LINK resources",
+      };
+    }
+    if (result.data.type === "IMAGE" && !result.data.imageKey) {
+      return {
+        status: "error",
+        message: "Image is required for IMAGE resources",
+      };
+    }
+    if (result.data.type === "DOCUMENT" && !result.data.documentKey) {
+      return {
+        status: "error",
+        message: "Document is required for DOCUMENT resources",
+      };
+    }
+
+    // Get max position
+    const maxPos = await prisma.activityResource.findFirst({
+      where: {
+        activityId: result.data.activityId,
+      },
+      select: {
+        position: true,
+      },
+      orderBy: {
+        position: 'desc',
+      },
+    });
+
+    // Create resource
+    await prisma.activityResource.create({
+      data: {
+        title: result.data.title,
+        type: result.data.type,
+        activityId: result.data.activityId,
+        position: (maxPos?.position ?? 0) + 1,
+        textContent: result.data.textContent,
+        linkUrl: result.data.linkUrl,
+        imageKey: result.data.imageKey,
+        documentKey: result.data.documentKey,
+      },
+    });
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: "success",
+      message: "Resource created successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to create resource",
+    };
+  }
+}
+
+export async function updateActivityResource(
+  values: ActivityResourceSchemaType,
+  resourceId: string
+): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const result = activityResourceSchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid data",
+      };
+    }
+
+    // Validate required fields
+    if (result.data.type === "TEXT" && !result.data.textContent) {
+      return {
+        status: "error",
+        message: "Text content is required for TEXT resources",
+      };
+    }
+    if (result.data.type === "LINK" && !result.data.linkUrl) {
+      return {
+        status: "error",
+        message: "Link URL is required for LINK resources",
+      };
+    }
+    if (result.data.type === "IMAGE" && !result.data.imageKey) {
+      return {
+        status: "error",
+        message: "Image is required for IMAGE resources",
+      };
+    }
+    if (result.data.type === "DOCUMENT" && !result.data.documentKey) {
+      return {
+        status: "error",
+        message: "Document is required for DOCUMENT resources",
+      };
+    }
+
+    await prisma.activityResource.update({
+      where: {
+        id: resourceId,
+      },
+      data: {
+        title: result.data.title,
+        type: result.data.type,
+        textContent: result.data.textContent,
+        linkUrl: result.data.linkUrl,
+        imageKey: result.data.imageKey,
+        documentKey: result.data.documentKey,
+      },
+    });
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: "success",
+      message: "Resource updated successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to update resource",
+    };
+  }
+}
+
+export async function deleteActivityResource({
+  resourceId,
+  activityId,
+}: {
+  resourceId: string;
+  activityId: string;
+}): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const activityWithResources = await prisma.activity.findUnique({
+      where: {
+        id: activityId,
+      },
+      select: {
+        resources: {
+          orderBy: {
+            position: 'asc',
+          },
+          select: {
+            id: true,
+            position: true,
+          },
+        },
+      },
+    });
+
+    if (!activityWithResources) {
+      return {
+        status: 'error',
+        message: 'Activity not found.',
+      };
+    }
+
+    const resources = activityWithResources.resources;
+    const resourceToDelete = resources.find((r) => r.id === resourceId);
+
+    if (!resourceToDelete) {
+      return {
+        status: 'error',
+        message: 'Resource not found.',
+      };
+    }
+
+    const remainingResources = resources.filter((r) => r.id !== resourceId);
+    const updates = remainingResources.map((resource, index) =>
+      prisma.activityResource.update({
+        where: { id: resource.id },
+        data: { position: index + 1 },
+      })
+    );
+
+    await prisma.$transaction([
+      ...updates,
+      prisma.activityResource.delete({
+        where: { id: resourceId },
+      }),
+    ]);
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: 'success',
+      message: 'Resource deleted successfully.',
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to delete resource.",
+    };
+  }
+}
+
+export async function reorderActivityResources(
+  values: ReorderActivityResourcesSchemaType
+): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const result = reorderActivityResourcesSchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid data",
+      };
+    }
+
+    const updates = result.data.resources.map((resource) =>
+      prisma.activityResource.update({
+        where: {
+          id: resource.id,
+        },
+        data: {
+          position: resource.position,
+        },
+      })
+    );
+
+    await prisma.$transaction(updates);
+    revalidatePath(`/admin/courses`);
+
+    return {
+      status: "success",
+      message: "Resources reordered successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to reorder resources",
+    };
+  }
+}
+
+export async function getActivitiesData(lessonId: string) {
+  await requireAdmin();
+
+  try {
+    const activities = await prisma.activity.findMany({
+      where: {
+        lessonId: lessonId,
+      },
+      orderBy: {
+        position: 'asc',
+      },
+      select: {
+        id: true,
+        title: true,
+        shortDescription: true,
+        description: true,
+        position: true,
+        resources: {
+          orderBy: {
+            position: 'asc',
+          },
+          select: {
+            id: true,
+            title: true,
+            type: true,
+            position: true,
+            textContent: true,
+            linkUrl: true,
+            imageKey: true,
+            documentKey: true,
+          },
+        },
+      },
+    });
+
+    return activities;
+  } catch (error) {
+    console.error("Failed to fetch activities:", error);
+    return null;
+  }
+}
+export async function getActivityResourcesData(activityId: string) {
+  await requireAdmin();
+
+  try {
+    const resources = await prisma.activityResource.findMany({
+      where: { activityId },
+      orderBy: { position: 'asc' },
+      select: {
+        id: true,
+        title: true,
+        type: true,
+        position: true,
+        textContent: true,
+        linkUrl: true,
+        imageKey: true,
+        documentKey: true,
+      },
+    });
+
+    return resources;
+  } catch (error) {
+    console.error("Failed to fetch activity resources:", error);
+    return null;
   }
 }
 

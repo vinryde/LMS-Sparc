@@ -160,6 +160,7 @@ model Lesson{
   quiz Quiz?
   feedback Feedback?
   resources Resource[]
+  activities Activity[]
 }
 
 model Enrollment{
@@ -437,4 +438,39 @@ enum ResourceType {
   LINK
   IMAGE
   DOCUMENT
+}
+
+model Activity {
+  id          String   @id @default(uuid())
+  title       String
+  shortDescription String?
+  description String   // Rich text content
+  position    Int
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lessonId    String
+  
+  resources   ActivityResource[]
+}
+
+model ActivityResource {
+  id          String       @id @default(uuid())
+  title       String
+  type        ResourceType
+  position    Int
+  
+  // Fields for different resource types
+  textContent String?      // For TEXT type
+  linkUrl     String?      // For LINK type
+  imageKey    String?      // For IMAGE type
+  documentKey String?      // For DOCUMENT type
+  
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  activity    Activity     @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  activityId  String
 }

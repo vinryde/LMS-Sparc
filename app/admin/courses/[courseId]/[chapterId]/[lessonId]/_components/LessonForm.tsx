@@ -14,251 +14,249 @@ import { RichTextEditor } from "@/components/rich-text-editor/Editor";
 import { Uploader } from "@/components/file-uploader/Uploader";
 import { useTransition, useState, useEffect } from "react";
 import { tryCatch } from "@/hooks/try-catch";
-import { updateLesson, getQuizData, getFeedbackData, getResourcesData } from "../actions";
+import { updateLesson, getQuizData, getFeedbackData, getResourcesData,getActivitiesData } from "../actions";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import { QuizManager } from "./QuizManager";
 import { FeedbackManager } from "./FeedbackManager";
 import { ResourceManager } from "./ResourceManager";
 
+// -------------- NEW IMPORTS -------------- //
+import { ActivityManager } from "./ActivityManager";
+
+
 interface iAppProps {
-    data: AdminLessonType;
-    chapterId: string;
-    courseId: string;
+  data: AdminLessonType;
+  chapterId: string;
+  courseId: string;
 }
 
-export function LessonForm({chapterId, data, courseId}: iAppProps) {
-    const [pending, startTransition] = useTransition();
-    const [quizData, setQuizData] = useState<any>(null);
-    const [feedbackData, setFeedbackData] = useState<any>(null);
-    const [resourcesData, setResourcesData] = useState<any[]>([]);
-    const [isLoadingQuiz, setIsLoadingQuiz] = useState(true);
-    const [isLoadingFeedback, setIsLoadingFeedback] = useState(true);
-    const [isLoadingResources, setIsLoadingResources] = useState(true);
-    
-    const form = useForm<LessonSchemaType>({
-        resolver: zodResolver(lessonSchema),
-        defaultValues: {
-            name: data.title,
-            chapterId: chapterId,
-            courseId: courseId,
-            description: data.description ?? undefined,
-            videoKey: data.videoKey ?? undefined,
-            thumbnailKey: data.thumbnailKey ?? undefined,
-            documentKey: data.documentKey ?? undefined,
-        },
-    });
+export function LessonForm({ chapterId, data, courseId }: iAppProps) {
+  const [pending, startTransition] = useTransition();
+  const [quizData, setQuizData] = useState<any>(null);
+  const [feedbackData, setFeedbackData] = useState<any>(null);
+  const [resourcesData, setResourcesData] = useState<any[]>([]);
 
-    // Fetch quiz, feedback, and resources data on mount
-    useEffect(() => {
-        async function fetchData() {
-            setIsLoadingQuiz(true);
-            setIsLoadingFeedback(true);
-            setIsLoadingResources(true);
-            
-            try {
-                // Fetch quiz
-                const { data: quizResult, error: quizError } = await tryCatch(getQuizData(data.id));
-                if (!quizError && quizResult) {
-                    setQuizData(quizResult);
-                }
-                
-                // Fetch feedback
-                const { data: feedbackResult, error: feedbackError } = await tryCatch(getFeedbackData(data.id));
-                if (!feedbackError && feedbackResult) {
-                    setFeedbackData(feedbackResult);
-                }
+  const [isLoadingQuiz, setIsLoadingQuiz] = useState(true);
+  const [isLoadingFeedback, setIsLoadingFeedback] = useState(true);
+  const [isLoadingResources, setIsLoadingResources] = useState(true);
 
-                // Fetch resources
-                const { data: resourcesResult, error: resourcesError } = await tryCatch(getResourcesData(data.id));
-                if (!resourcesError && resourcesResult) {
-                    setResourcesData(resourcesResult || []);
-                }
-            } catch (error) {
-                console.error("Failed to fetch data:", error);
-            } finally {
-                setIsLoadingQuiz(false);
-                setIsLoadingFeedback(false);
-                setIsLoadingResources(false);
-            }
-        }
-        fetchData();
-    }, [data.id]);
+  // -------------- NEW ACTIVITY STATES -------------- //
+  const [activitiesData, setActivitiesData] = useState<any[]>([]);
+  const [isLoadingActivities, setIsLoadingActivities] = useState(true);
 
-    function onSubmit(values: LessonSchemaType) {
-        startTransition(async()=>{
-            const{data:result,error}= await tryCatch(updateLesson(values, data.id));
-            if(error){
-                toast.error("An unexpected error occurred. Please try again.");
-                return;
-            }
-            if(result.status=== 'success'){
-                toast.success(result.message);
-            }
-            else if(result.status === 'error'){
-                toast.error(result.message);
-            }
-        });
+  const form = useForm<LessonSchemaType>({
+    resolver: zodResolver(lessonSchema),
+    defaultValues: {
+      name: data.title,
+      chapterId,
+      courseId,
+      description: data.description ?? undefined,
+      videoKey: data.videoKey ?? undefined,
+      thumbnailKey: data.thumbnailKey ?? undefined,
+      documentKey: data.documentKey ?? undefined,
+    },
+  });
+
+  // -------------- UPDATED FETCH INCLUDING ACTIVITIES -------------- //
+  useEffect(() => {
+    async function fetchData() {
+      setIsLoadingQuiz(true);
+      setIsLoadingFeedback(true);
+      setIsLoadingResources(true);
+      setIsLoadingActivities(true);
+
+      try {
+        const { data: quizResult } = await tryCatch(getQuizData(data.id));
+        if (quizResult) setQuizData(quizResult);
+
+        const { data: feedbackResult } = await tryCatch(getFeedbackData(data.id));
+        if (feedbackResult) setFeedbackData(feedbackResult);
+
+        const { data: resourcesResult } = await tryCatch(getResourcesData(data.id));
+        if (resourcesResult) setResourcesData(resourcesResult || []);
+
+        // -------- Fetch Activities -------- //
+        const { data: activitiesResult } = await tryCatch(getActivitiesData(data.id));
+        if (activitiesResult) setActivitiesData(activitiesResult || []);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setIsLoadingQuiz(false);
+        setIsLoadingFeedback(false);
+        setIsLoadingResources(false);
+        setIsLoadingActivities(false);
+      }
     }
+    fetchData();
+  }, [data.id]);
 
-    return (
-        <div>
-            <Link className={buttonVariants ({variant: 'outline', className:'mb-6'})} href={`/admin/courses/${courseId}/edit`}>
-                <ArrowLeft className="size-4" />
-                <span>Go Back</span>
-            </Link>
-            
-            <Card>
-                <CardHeader>
-                    <CardTitle>Lesson Configuration</CardTitle>
-                    <CardDescription>Configure the video and description for this lesson.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                            <FormField control={form.control} name="name" render={({field})=>(
-                                <FormItem>
-                                    <FormLabel>
-                                        Lesson Name 
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Lesson Name"{...field} /> 
-                                    </FormControl>
-                                    <FormMessage/> 
-                                </FormItem>
-                            )}/> 
+  function onSubmit(values: LessonSchemaType) {
+    startTransition(async () => {
+      const { data: result, error } = await tryCatch(updateLesson(values, data.id));
+      if (error) {
+        toast.error("An unexpected error occurred. Please try again.");
+        return;
+      }
+      result.status === "success" ? toast.success(result.message) : toast.error(result.message);
+    });
+  }
 
-                            <FormField control={form.control} name="description" render={({field})=>(
-                                <FormItem>
-                                    <FormLabel>
-                                        Description
-                                    </FormLabel>
-                                    <FormControl>
-                                        <RichTextEditor field={field} /> 
-                                    </FormControl>
-                                    <FormMessage/> 
-                                </FormItem>
-                            )}/> 
+  return (
+    <div>
+      <Link className={buttonVariants({ variant: "outline", className: "mb-6" })} href={`/admin/courses/${courseId}/edit`}>
+        <ArrowLeft className="size-4" />
+        <span>Go Back</span>
+      </Link>
 
-                            <FormField control={form.control} name="thumbnailKey" render={({field})=>(
-                                <FormItem>
-                                    <FormLabel>
-                                        Thumbnail Image
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Uploader onChange={field.onChange} value={field.value} fileTypeAccepted="image" />
-                                    </FormControl>
-                                    <FormMessage/> 
-                                </FormItem>
-                            )}/> 
+      {/* ================= LESSON FORM ================= */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Lesson Configuration</CardTitle>
+          <CardDescription>Configure the video and description for this lesson.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField control={form.control} name="name" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Lesson Name</FormLabel>
+                  <FormControl><Input placeholder="Lesson Name" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
 
-                            <FormField control={form.control} name="videoKey" render={({field})=>(
-                                <FormItem>
-                                    <FormLabel>
-                                        Video File
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Uploader onChange={field.onChange} value={field.value} fileTypeAccepted="video" />
-                                    </FormControl>
-                                    <FormMessage/> 
-                                </FormItem>
-                            )}/> 
+              <FormField control={form.control} name="description" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl><RichTextEditor field={field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
 
-                            <FormField control={form.control} name="documentKey" render={({field})=>(
-                                <FormItem>
-                                    <FormLabel>
-                                        Study Materials
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Uploader onChange={field.onChange} value={field.value} fileTypeAccepted="document" />
-                                    </FormControl>
-                                    <FormMessage/> 
-                                </FormItem>
-                            )}/> 
-                            
-                            <Button disabled={pending} type="submit">
-                                {pending ? 'Saving..' : "Save Lesson"}
-                            </Button>
-                        </form>
-                    </Form>
-                </CardContent>
-            </Card>
+              <FormField control={form.control} name="thumbnailKey" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Thumbnail Image</FormLabel>
+                  <FormControl><Uploader onChange={field.onChange} value={field.value} fileTypeAccepted="image" /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
 
-            <Separator className="my-6" />
+              <FormField control={form.control} name="videoKey" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Video File</FormLabel>
+                  <FormControl><Uploader onChange={field.onChange} value={field.value} fileTypeAccepted="video" /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
 
-            {/* Quiz Section */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Quiz (Optional)</CardTitle>
-                    <CardDescription>
-                        Add an interactive quiz to test learners' understanding of this lesson
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    {isLoadingQuiz ? (
-                        <div className="flex items-center justify-center py-8">
-                            <div className="text-sm text-muted-foreground">Loading quiz...</div>
-                        </div>
-                    ) : (
-                        <QuizManager 
-                            lessonId={data.id} 
-                            initialQuiz={quizData}
-                            onQuizUpdate={(updatedQuiz) => setQuizData(updatedQuiz)}
-                        />
-                    )}
-                </CardContent>
-            </Card>
+              <FormField control={form.control} name="documentKey" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Study Materials</FormLabel>
+                  <FormControl><Uploader onChange={field.onChange} value={field.value} fileTypeAccepted="document" /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
 
-            <Separator className="my-6" />
+              <Button disabled={pending} type="submit">
+                {pending ? "Saving..." : "Save Lesson"}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
 
-            {/* Feedback Section */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Student Feedback (Optional)</CardTitle>
-                    <CardDescription>
-                        Collect feedback from students about this lesson to improve your content
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    {isLoadingFeedback ? (
-                        <div className="flex items-center justify-center py-8">
-                            <div className="text-sm text-muted-foreground">Loading feedback...</div>
-                        </div>
-                    ) : (
-                        <FeedbackManager 
-                            lessonId={data.id} 
-                            initialFeedback={feedbackData}
-                            onFeedbackUpdate={(updatedFeedback) => setFeedbackData(updatedFeedback)}
-                        />
-                    )}
-                </CardContent>
-            </Card>
+      <Separator className="my-6" />
 
-            <Separator className="my-6" />
+      {/* ================= NEW ACTIVITIES SECTION ================= */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Activities (Optional)</CardTitle>
+          <CardDescription>Add engaging activities for students to reinforce their learning</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoadingActivities ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-sm text-muted-foreground">Loading activities...</div>
+            </div>
+          ) : (
+            <ActivityManager
+              lessonId={data.id}
+              initialActivities={activitiesData}
+              onActivityUpdate={(updated) => setActivitiesData(updated)}
+            />
+          )}
+        </CardContent>
+      </Card>
 
-            {/* Resources Section */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Resources (Optional)</CardTitle>
-                    <CardDescription>
-                        Add additional learning resources like text notes, links, images, or documents for students
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    {isLoadingResources ? (
-                        <div className="flex items-center justify-center py-8">
-                            <div className="text-sm text-muted-foreground">Loading resources...</div>
-                        </div>
-                    ) : (
-                        <ResourceManager 
-                            lessonId={data.id} 
-                            initialResources={resourcesData}
-                            onResourceUpdate={(updatedResources) => setResourcesData(updatedResources)}
-                        />
-                    )}
-                </CardContent>
-            </Card>
-        </div>
-    );
+      <Separator className="my-6" />
+
+      {/* ================= QUIZ SECTION ================= */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quiz (Optional)</CardTitle>
+          <CardDescription>Add an interactive quiz to test learners' understanding</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoadingQuiz ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-sm text-muted-foreground">Loading quiz...</div>
+            </div>
+          ) : (
+            <QuizManager
+              lessonId={data.id}
+              initialQuiz={quizData}
+              onQuizUpdate={(updated) => setQuizData(updated)}
+            />
+          )}
+        </CardContent>
+      </Card>
+
+      <Separator className="my-6" />
+
+      {/* ================= FEEDBACK SECTION ================= */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Student Feedback (Optional)</CardTitle>
+          <CardDescription>Collect feedback to improve lesson content</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoadingFeedback ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-sm text-muted-foreground">Loading feedback...</div>
+            </div>
+          ) : (
+            <FeedbackManager
+              lessonId={data.id}
+              initialFeedback={feedbackData}
+              onFeedbackUpdate={(updated) => setFeedbackData(updated)}
+            />
+          )}
+        </CardContent>
+      </Card>
+
+      <Separator className="my-6" />
+
+      {/* ================= RESOURCES SECTION ================= */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Resources (Optional)</CardTitle>
+          <CardDescription>Add notes, links, images, or documents for learners</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoadingResources ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-sm text-muted-foreground">Loading resources...</div>
+            </div>
+          ) : (
+            <ResourceManager
+              lessonId={data.id}
+              initialResources={resourcesData}
+              onResourceUpdate={(updated) => setResourcesData(updated)}
+            />
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
-
