@@ -100,13 +100,13 @@ await prisma.$transaction(updates);
 revalidatePath(`/admin/courses/${courseId}/edit`)
 return{
     status:'success',
-    message: 'Lessons reordered successfully',
+    message: 'Capsules reordered successfully',
 };
 }
 catch{
     return{
         status: "error",
-        message:"Failed to reorder lessons.",
+        message:"Failed to reorder capsules.",
     };
 }
 
@@ -118,7 +118,7 @@ export async function reorderChapters(courseId: string, chapters: {id: string; p
       if(!chapters || chapters.length===0){
         return{
             status:'error',
-            message:'No chapters provided for reordering. '
+            message:'No modules provided for reordering. '
         };
       }
       const updates = chapters.map((chapter) => prisma.chapter.update({
@@ -135,12 +135,12 @@ export async function reorderChapters(courseId: string, chapters: {id: string; p
 
       return {
         status:'success',
-        message:'Chapters reordered successfully.',
+        message:'Modules reordered successfully.',
       }
     } catch {
         return {
             status: "error",
-            message:"Failed to reorder chapters.",
+            message:"Failed to reorder modules.",
         }
     }
 }
