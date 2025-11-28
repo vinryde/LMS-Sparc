@@ -99,6 +99,44 @@ return(
                 View Resource
             </Link>
         )}
+        {data.activities && data.activities.length > 0 && (
+                 <div className="mt-8">
+                   <Card className="border-2">
+                     <CardHeader>
+                       <CardTitle className="text-xl">Activities</CardTitle>
+                       <p className="text-sm text-muted-foreground">
+                         Practice tasks to reinforce learning
+                       </p>
+                     </CardHeader>
+                     <CardContent className="space-y-4">
+                       {data.activities.map((activity) => (
+                         <div key={activity.id} className="p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                           <div className="flex items-center justify-between gap-3">
+                             <div className="flex-1 min-w-0">
+                               <h3 className="font-semibold text-base">{activity.title}</h3>
+                               {activity.shortDescription && (
+                                 <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                                   {activity.shortDescription}
+                                 </p>
+                               )}
+                             </div>
+                             <Button
+                               asChild
+                               variant="outline"
+                               size="sm"
+                               className="shrink-0"
+                             >
+                               <Link href={`/dashboard/${data.chapter.course.slug}/${data.id}/activity/${activity.id}`}>
+                                 View Activity
+                               </Link>
+                             </Button>
+                           </div>
+                         </div>
+                       ))}
+                     </CardContent>
+                   </Card>
+                 </div>
+               )}
 
          {/* Resources Section */}
          {data.resources && data.resources.length > 0 && (

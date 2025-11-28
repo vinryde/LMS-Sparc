@@ -113,10 +113,19 @@ export async function getLessonContent(lessonId:string){
                documentKey: true,
              },
            },
-           
+           activities: {
+             orderBy: {
+               position: 'asc',
+             },
+             select: {
+               id: true,
+               title: true,
+               shortDescription: true,
+               position: true,
+             },
+           },
            chapter:{
             select:{
-                 
                 courseId: true,
                 course:{
                     select:{
