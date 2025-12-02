@@ -16,6 +16,8 @@ import { NewChapterModel } from "./NewChapterModel";
 import { NewLessonModel } from "./NewLessonModel";
 import { DeleteLesson } from "./DeleteLesson";
 import { DeleteChapter } from "./DeleteChapter";
+import { EditChapter } from "./EditChapter";
+import { EditLesson } from "./EditLesson";
 
 interface iAppProps{
     data: AdminCourseSingularType;
@@ -104,14 +106,14 @@ function SortableItem({id, children, className, data}: SortableItemProps) {
         }
 
        if(!targetChapterId){
-        toast.error("Could not determine the chapter for reordering");
+        toast.error("Could not determine the module for reordering");
         return;
        }   
       const oldIndex = items.findIndex((item) => item.id === activeId);
       const newIndex = items.findIndex((item)=> item.id === targetChapterId);
       if(oldIndex===-1|| newIndex===-1)
       {
-        toast.error("Could not find chapter old/new index for reordering");
+        toast.error("Could not find module old/new index for reordering");
         return;
       }
       const reorderedLocalChapter= arrayMove(items, oldIndex, newIndex);
@@ -135,7 +137,7 @@ function SortableItem({id, children, className, data}: SortableItemProps) {
       const reorderPromise = () => reorderChapters(courseId, chaptersToUpdate);
 
       toast.promise(reorderPromise(), {
-        loading:'Reordering chapters...',
+        loading:'Reordering modules...',
         success: (result) => {
           if(result.status === 'success') return result.message;
 
@@ -143,7 +145,7 @@ function SortableItem({id, children, className, data}: SortableItemProps) {
         },
         error: () => {
           setItems(previousItems);
-          return "Failed to reorder chapters";
+          return "Failed to reorder modules";
         },
       });
     }
@@ -154,12 +156,12 @@ function SortableItem({id, children, className, data}: SortableItemProps) {
          const overChapterId = over.data.current?.chapterId;
 
          if(!chapterId || chapterId !== overChapterId) {
-          toast.error("lesson move between chapters or invalid chapter ID is not allowed.");
+          toast.error("capsule move between modules or invalid module ID is not allowed.");
           return;
        }
        const chapterIndex = items.findIndex((chapter) => chapter.id === chapterId);
        if(chapterIndex === -1) {
-        toast.error("Could not find chapter index for reordering");
+        toast.error("Could not find module index for reordering");
         return;
        }
 
@@ -170,7 +172,7 @@ function SortableItem({id, children, className, data}: SortableItemProps) {
 
        const newLessonIndex = chapterToUpdate.lessons.findIndex((lesson) => lesson.id === overId);
        if(oldLessonIndex === -1 || newLessonIndex === -1) {
-        toast.error ('Coukd not find lesson for reordering')
+        toast.error ('Could not find capsule for reordering')
         return;
        }
 
@@ -198,14 +200,14 @@ if(courseId){
   }));
   const reorderLessonsPromise = () => reorderLessons(chapterId, lessonsToUpdate, courseId);
   toast.promise(reorderLessonsPromise(),{
-    loading: 'Reordering Lessons...',
+    loading: 'Reordering Capsules...',
     success: (result) => {
        if(result.status === "success") return result.message;
        throw new Error(result.message);
     },
     error: () => {
       setItems(previousItems);
-      return 'Failed to reordered Lessons'
+      return 'Failed to reordered Capsules'
     }
   })
 }
@@ -253,7 +255,10 @@ function toggleChapter(chapterId: string){
      </CollapsibleTrigger>
      <p className="cursor-pointer hover:text-primary pl-2">{item.title}</p>
      </div>
-      <DeleteChapter chapterId={item.id} courseId={data.id}/>
+       <div className="flex items-center gap-1">
+        <EditChapter chapterId={item.id} courseId={data.id} currentTitle={item.title}/>
+        <DeleteChapter chapterId={item.id} courseId={data.id}/>
+       </div>
 
     </div>
     <CollapsibleContent>
@@ -270,7 +275,10 @@ function toggleChapter(chapterId: string){
              <FileText className="size-4"/>
              <Link href={`/admin/courses/${data.id}/${item.id}/${lesson.id}`}>{lesson.title}</Link>
             </div>
-            <DeleteLesson chapterId={item.id} lessonId={lesson.id} courseId={data.id}/>
+             <div className="flex items-center gap-1">
+                <EditLesson courseId={data.id} chapterId={item.id} lessonId={lesson.id} currentTitle={lesson.title}/>
+                <DeleteLesson chapterId={item.id} lessonId={lesson.id} courseId={data.id}/>
+              </div>
           </div>
         )}
         </SortableItem>
@@ -293,4 +301,4 @@ function toggleChapter(chapterId: string){
 
         </DndContext>
     )
-} 
+}

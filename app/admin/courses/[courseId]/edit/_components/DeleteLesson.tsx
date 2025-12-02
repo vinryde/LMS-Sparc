@@ -45,7 +45,7 @@ export function DeleteLesson({
          <AlertDialogContent>
             <AlertDialogHeader>
                 <AlertDialogTitle> Are you absolutely sure? </AlertDialogTitle>
-                <AlertDialogDescription> This action cannot be undone.This will permanently delete this lesson. </AlertDialogDescription>
+                <AlertDialogDescription> This action cannot be undone.This will permanently delete this capsule. </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>

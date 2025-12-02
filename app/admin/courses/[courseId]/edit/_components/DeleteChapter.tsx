@@ -43,7 +43,7 @@ export function DeleteChapter({
          <AlertDialogContent>
             <AlertDialogHeader>
                 <AlertDialogTitle> Are you absolutely sure? </AlertDialogTitle>
-                <AlertDialogDescription> This action cannot be undone.This will permanently delete this chapter. </AlertDialogDescription>
+                <AlertDialogDescription> This action cannot be undone.This will permanently delete this module. </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>

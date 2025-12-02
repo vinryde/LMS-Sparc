@@ -96,7 +96,7 @@ return(
            )}
            {data.documentKey && (
            <Link href={document}  className="text-primary font-medium">
-                View Resource
+                View Study Materials
             </Link>
         )}
         {data.activities && data.activities.length > 0 && (

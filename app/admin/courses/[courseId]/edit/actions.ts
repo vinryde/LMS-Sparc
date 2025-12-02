@@ -380,3 +380,72 @@ await prisma.$transaction([
         };
     }
 }
+
+
+export async function updateChapter(values: ChapterSchemaType, chapterId: string): Promise<ApiResponse> {
+  await requireAdmin();
+  try {
+    const result = chapterSchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid Data",
+      };
+    }
+
+    await prisma.chapter.update({
+      where: {
+        id: chapterId,
+        courseId: result.data.courseId,
+      },
+      data: {
+        title: result.data.name,
+      },
+    });
+
+    revalidatePath(`/admin/courses/${result.data.courseId}/edit`);
+    return {
+      status: "success",
+      message: "Module updated successfully.",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to update module.",
+    };
+  }
+}
+
+export async function updateLesson(values: LessonSchemaType, lessonId: string): Promise<ApiResponse> {
+  await requireAdmin();
+  try {
+    const result = lessonSchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid Data",
+      };
+    }
+
+    await prisma.lesson.update({
+      where: {
+        id: lessonId,
+        chapterId: result.data.chapterId,
+      },
+      data: {
+        title: result.data.name,
+      },
+    });
+
+    revalidatePath(`/admin/courses/${result.data.courseId}/edit`);
+    return {
+      status: "success",
+      message: "Capsule updated successfully.",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to update capsule.",
+    };
+  }
+}
