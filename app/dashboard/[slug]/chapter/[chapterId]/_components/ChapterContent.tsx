@@ -62,9 +62,9 @@ export function ChapterContent({ data }: Props) {
         <div className="mt-6">
           <Card className="border-2">
             <CardHeader>
-              <CardTitle className="text-xl">Lessons in this module</CardTitle>
+              <CardTitle className="text-xl"> Capsules in this module</CardTitle>
               <p className="text-sm text-muted-foreground">
-                Select a lesson to start learning
+                Select a capsule to start learning
               </p>
             </CardHeader>
             <CardContent className="space-y-2">
