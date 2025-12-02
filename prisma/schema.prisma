@@ -133,6 +133,9 @@ model Chapter{
 
   title String
   position Int
+  description String?           
+  thumbnailKey String?           
+  videoKey String?               
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

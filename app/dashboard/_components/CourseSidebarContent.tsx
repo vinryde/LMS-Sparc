@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { LessonItem } from "./LessonItem";
 import { usePathname } from "next/navigation";
 import { useCourseProgress } from "@/hooks/use-course-progress";
+import Link from "next/link";
 
 interface iAppProps {
     course: CourseSidebarDataType['course'];
@@ -56,8 +57,18 @@ export function CourseSidebarContent({ course, onItemClick }: iAppProps) {
                                     <ChevronDown className="size-4 text-primary" />
                                 </div>
                                 <div className="flex-1 text-left min-w-0">
-                                    <p className="font-semibold text-sm truncate text-foreground">
-                                        {chapter.position}: {chapter.title}
+                                   <p className="font-semibold text-sm truncate text-foreground">
+                                        {/* Chapter title link */}
+                                        <Link
+                                          href={`/dashboard/${course.slug}/chapter/${chapter.id}`}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            onItemClick?.();
+                                          }}
+                                          className="hover:underline"
+                                        >
+                                          {chapter.position}: {chapter.title}
+                                        </Link>
                                     </p>
                                     <p className="text-[10px] text-muted-foreground font-medium truncate">
                                         {chapter.lesson.length} lessons

@@ -253,7 +253,9 @@ function toggleChapter(chapterId: string){
           {item.isOpen ? (<ChevronDown className="size-4"/>):(<ChevronRight className="size-4"/>)}
       </Button>
      </CollapsibleTrigger>
-     <p className="cursor-pointer hover:text-primary pl-2">{item.title}</p>
+ <p className="cursor-pointer hover:text-primary pl-2"><Link href={`/admin/courses/${data.id}/${item.id}`} className="cursor-pointer hover:text-primary pl-2">
+ {item.title}
+ </Link></p>
      </div>
        <div className="flex items-center gap-1">
         <EditChapter chapterId={item.id} courseId={data.id} currentTitle={item.title}/>
