@@ -9,13 +9,15 @@ import { Button } from "@/components/ui/button";
 import { CheckIcon, Loader2, PlusIcon } from "lucide-react";
 import { checkIfAssessmentCompleted } from "../[slug]/actions";
 import { enrollInCourseAction } from "../[slug]/actions";
+import Link from "next/link";
 
 interface EnrollButtonProps {
   courseId: string;
   enrolled: boolean;
+  slugone: string;
 }
 
-export function EnrollButton({ courseId, enrolled }: EnrollButtonProps) {
+export function EnrollButton({ courseId, enrolled, slugone }: EnrollButtonProps) {
   const [isEnrolled, setIsEnrolled] = useState(enrolled);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -50,8 +52,7 @@ export function EnrollButton({ courseId, enrolled }: EnrollButtonProps) {
         } else if (result?.status === "error") {
           toast.error(result.message);
         } else if (result?.status === "enrolled") {
-          toast.error(result.message);
-          router.push("/dashboard");
+          router.push(`/dashboard/${slugone}`);
         }
       } else {
         // User needs to complete assessment first
@@ -64,7 +65,7 @@ export function EnrollButton({ courseId, enrolled }: EnrollButtonProps) {
   return (
     <Button
       onClick={() => onSubmit(courseId)}
-      disabled={isPending || isEnrolled}
+      disabled={isPending}
       className="w-full"
     >
       {isPending ? (
@@ -73,7 +74,8 @@ export function EnrollButton({ courseId, enrolled }: EnrollButtonProps) {
         </>
       ) : isEnrolled ? (
         <>
-          You're Already Enrolled <CheckIcon className="ml-2" size={18} />
+          View Course <CheckIcon className="ml-2" size={18} />
+          
         </>
       ) : (
         <>

@@ -237,7 +237,7 @@ export default async function SlugPage({params}: {params: Params}) {
 
                               </ul>
                             </div>
-                            <EnrollButton courseId={course.id} enrolled={enrolled} />
+                            <EnrollButton courseId={course.id} slugone={slug} enrolled={enrolled} />
                             <p className="mt-3 text-center text-xs text-muted-foreground">
                                 Enroll now and start learning.
                             </p>
