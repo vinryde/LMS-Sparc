@@ -474,3 +474,27 @@ export async function deleteAssessmentSection({
     };
   }
 }
+
+export async function deleteAssessment(assessmentId: string): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    await prisma.assessment.delete({
+      where: { id: assessmentId },
+    });
+
+    // Revalidate admin assessment list and the edit page route
+    revalidatePath("/admin/assessment");
+    revalidatePath(`/admin/assessment/${assessmentId}/edit`);
+
+    return {
+      status: "success",
+      message: "Assessment deleted successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to delete assessment",
+    };
+  }
+}

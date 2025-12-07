@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { GraduationCap } from "lucide-react";
+import { EditAssessmentForm } from "./_components/EditAssessmentForm";
+import { DeleteAssessmentButton } from "./_components/DeleteAssessmentButton";
 
 type Params = Promise<{ assessmentId: string }>;
 
@@ -40,6 +42,15 @@ export default async function EditAssessmentPage({ params }: { params: Params })
               </Link>
             </div>
           </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between gap-4 mb-6">
+              <p className="text-sm text-muted-foreground">
+                Update the title and description below. Course is fixed for this assessment.
+              </p>
+              <DeleteAssessmentButton assessmentId={assessment.id} />
+            </div>
+            <EditAssessmentForm data={assessment} />
+          </CardContent>
         </Card>
 
         <AssessmentStructure data={assessment} />
