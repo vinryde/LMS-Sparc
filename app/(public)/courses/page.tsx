@@ -4,7 +4,7 @@ import { Suspense } from "react";
 
 export default function PublicCoursesroute() {
   return (
-    <div className="mt-5">
+    <div className="mt-5 p-4">
         <div className="flex flex-col space-y-2 mb-10">
       <h1 className="text-3xl md:text-4xl font-bold tracking-tighter">Explore Courses</h1>
       <p className="text-muted-foreground md:text-lg">Discover a world of energy education with our curated selection of courses. Whether you're a student, educator, or simply curious about energy, we have something for everyone.</p>

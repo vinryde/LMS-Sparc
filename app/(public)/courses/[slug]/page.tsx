@@ -19,7 +19,7 @@ export default async function SlugPage({params}: {params: Params}) {
     
 
     return(
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mt-5">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mt-5 p-4">
             <div className="order-1 lg:col-span-2">
                 <div className="relative aspect-video w-full overflow-hidden rounded-xl shadow-lg">
                     <Image src={`https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME_IMAGES as string}.t3.storage.dev/${course.fileKey}`} 

@@ -111,7 +111,7 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <Link href="/">
-               <Image src={profile} alt="Logo" className="size-5"/>
+
                 <span className="text-base font-semibold">CREATE LMS.</span>
               </Link>
             </SidebarMenuButton>

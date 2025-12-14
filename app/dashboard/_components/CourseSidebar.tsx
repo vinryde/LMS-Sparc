@@ -9,7 +9,7 @@ interface iAppProps {
 
 export function CourseSidebar({ course }: iAppProps) {
     return (
-        <div className="h-full sticky top-0">
+        <div className=" sticky top-10">
             <CourseSidebarContent course={course} />
         </div>
     );

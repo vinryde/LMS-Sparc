@@ -20,8 +20,8 @@ export function CourseSidebarMobile({ course }: iAppProps) {
                 <SheetTrigger asChild>
                     <Button
                         variant="outline"
-                        size="icon"
-                        className="fixed top-15 left-0.5 z-50 shadow-lg md:hidden"
+                        size="sm"
+                        className="fixed top-14 left-0.5 z-50 shadow-lg md:hidden"
                     >
                         {open ? <X className="size-5" /> : <Menu className="size-3" />}
                         <span className="sr-only">Toggle course menu</span>
