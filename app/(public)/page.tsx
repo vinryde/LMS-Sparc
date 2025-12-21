@@ -12,6 +12,7 @@ import { HomeFeatures } from "@/components/homefeatures";
 import FeaturesSectionMinimal from "@/components/bento-monochrome";
 import FeaturesSectionMinimalClimate from "@/components/bento-climate";
 import ScrollingHeroMarquee from "@/components/scrolling-hero-marquee";
+import { MagicText } from "@/components/ui/magic-text";
 interface featureProps {
   title: string;
   description: string;
@@ -66,13 +67,13 @@ export default function Home() {
           </div>
           <HomeFeatures />
           <FeaturesSectionMinimal/>
-          <div className="mx-4">
-          <ScrollingHeroMarquee
-        text="Save energy, save the future. Small changes create big impact. Be energy smart, embrace efficiency, choose renewables, and turn off unnecessary lights to protect the future and build responsible, sustainable communities."
-        durationSec={15}
-        rowHeight={200}
-        fontSize="clamp(2rem, 6vw, 4rem)"       
-      />
+          <div className="mx-2 font-semibold md:mx-10">
+            <MagicText
+          text={
+          "CREATE(Climate Science Research, Energy Education and Training for Ecological Sustainability) is an educational initiative committed to building a climate-literate and energy-conscious society. Our core aim is to empower learners, educators, and communities with knowledge, skills, and awareness to address global climate and energy challenges responsibly. Through focused courses in Energy Education and Climate Science, CREATE promotes informed decision-making, innovation, and sustainable action. Guided by the belief that education drives change, CREATE embraces its mottos: Save energy, save the future. Small changes create big impact. Be energy smart, embrace efficiency, choose renewables, and turn off unnecessary lights to protect the future and build responsible, sustainable communities."
+        }
+        />
+          
       </div>
           <FeaturesSectionMinimalClimate/>
       

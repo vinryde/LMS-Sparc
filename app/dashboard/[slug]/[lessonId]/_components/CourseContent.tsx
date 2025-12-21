@@ -247,6 +247,7 @@ function ResourceItem({ resource }: { resource: any }) {
             alt={resource.title}
             fill
             className="object-contain"
+            onClick={() => window.open(imageUrl, "_blank")}
           />
         </div>
       </div>

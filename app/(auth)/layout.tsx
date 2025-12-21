@@ -3,7 +3,7 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
-import profile from "@/public/profile.png"
+import ku from "@/public/ku.png"
 
 export default function LoginLayout({children}:{children:ReactNode}){
     return(
@@ -18,7 +18,7 @@ export default function LoginLayout({children}:{children:ReactNode}){
              </Link> 
         <div className="flex w-full max-w-sm flex-col gap-6">
             <Link className="flex items-center gap-2 self-center font-medium" href="/">
-             <Image src={profile} alt="Logo" className="size-8"/>
+             <Image src={ku} alt="Logo" className="size-10"/>
              CREATE LMS
             </Link>
             {children}

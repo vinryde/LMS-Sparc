@@ -95,7 +95,7 @@ function ResourceItem({ resource }: { resource: any }) {
           <h3 className="font-semibold text-base flex-1">{resource.title}</h3>
         </div>
         <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-muted">
-          <Image src={imageUrl} alt={resource.title} fill className="object-contain" />
+          <Image src={imageUrl} alt={resource.title} fill className="object-contain" onClick={() => window.open(imageUrl, "_blank")} />
         </div>
       </div>
     );

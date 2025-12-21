@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import Image from "next/image";
-import profile from "@/public/profile.png";
+import ku from "@/public/ku.png";
 import { authClient } from "@/lib/auth-client";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -75,7 +75,7 @@ export function PublicMobileSidebar() {
         <div className="flex h-full flex-col">
           {/* Header */}
           <div className="flex items-center gap-2 px-4 py-4 border-b">
-            <Image src={profile} alt="Logo" className="size-6" />
+            <Image src={ku} alt="CREATE" width={40} height={40} />  
             <span className="text-base font-semibold">CREATE LMS.</span>
           </div>
 

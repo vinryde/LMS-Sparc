@@ -172,4 +172,12 @@
   body {
     @apply bg-background text-foreground;
   }
+  p,
+  span,
+  li,
+  blockquote,
+  small,
+  .prose {
+    font-family: var(--font-serif);
+  }
 }

@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import profile from "@/public/profile.png";
+import ku from "@/public/ku.png";
 import { ThemeToggle } from "@/components/ui/themeToggle";
 import { authClient } from "@/lib/auth-client";
 import { buttonVariants } from "@/components/ui/button";
@@ -30,6 +30,7 @@ export function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2 mr-4">
+        <Image src={ku} alt="CREATE" width={40} height={40} />  
           <span className="font-bold">CREATE.</span>
         </Link>
 

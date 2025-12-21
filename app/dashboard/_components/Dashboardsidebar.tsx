@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import Image from "next/image"
-import profile from "@/public/profile.png"
+import ku from "@/public/ku.png"
 
 const data = {
   user: {
@@ -111,8 +111,9 @@ export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sideb
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <Link href="/">
-
+                <Image src={ku} alt="CREATE" width={40} height={40} /> 
                 <span className="text-base font-semibold">CREATE LMS.</span>
+                 
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
