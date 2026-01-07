@@ -14,7 +14,7 @@ import { RichTextEditor } from "@/components/rich-text-editor/Editor";
 import { Uploader } from "@/components/file-uploader/Uploader";
 import { useTransition, useState, useEffect } from "react";
 import { tryCatch } from "@/hooks/try-catch";
-import { updateLesson, getQuizData, getFeedbackData, getResourcesData,getActivitiesData } from "../actions";
+import { updateLesson, getQuizData, getFeedbackData, getResourcesData,getActivitiesData, getInteractiveActivitiesData } from "../actions";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import { QuizManager } from "./QuizManager";
@@ -23,6 +23,7 @@ import { ResourceManager } from "./ResourceManager";
 
 // -------------- NEW IMPORTS -------------- //
 import { ActivityManager } from "./ActivityManager";
+import { InteractiveActivityManager } from "./InteractiveActivityManager";
 
 
 interface iAppProps {
@@ -45,6 +46,9 @@ export function LessonForm({ chapterId, data, courseId }: iAppProps) {
   const [activitiesData, setActivitiesData] = useState<any[]>([]);
   const [isLoadingActivities, setIsLoadingActivities] = useState(true);
 
+  const [interactiveActivitiesData, setInteractiveActivitiesData] = useState<any[]>([]);
+  const [isLoadingInteractiveActivities, setIsLoadingInteractiveActivities] = useState(true);
+
   const form = useForm<LessonSchemaType>({
     resolver: zodResolver(lessonSchema),
     defaultValues: {
@@ -65,6 +69,7 @@ export function LessonForm({ chapterId, data, courseId }: iAppProps) {
       setIsLoadingFeedback(true);
       setIsLoadingResources(true);
       setIsLoadingActivities(true);
+      setIsLoadingInteractiveActivities(true);
 
       try {
         const { data: quizResult } = await tryCatch(getQuizData(data.id));
@@ -79,6 +84,10 @@ export function LessonForm({ chapterId, data, courseId }: iAppProps) {
         // -------- Fetch Activities -------- //
         const { data: activitiesResult } = await tryCatch(getActivitiesData(data.id));
         if (activitiesResult) setActivitiesData(activitiesResult || []);
+
+        // -------- Fetch Interactive Activities -------- //
+        const { data: interactiveActivitiesResult } = await tryCatch(getInteractiveActivitiesData(data.id));
+        if (interactiveActivitiesResult) setInteractiveActivitiesData(interactiveActivitiesResult || []);
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
@@ -86,6 +95,7 @@ export function LessonForm({ chapterId, data, courseId }: iAppProps) {
         setIsLoadingFeedback(false);
         setIsLoadingResources(false);
         setIsLoadingActivities(false);
+        setIsLoadingInteractiveActivities(false);
       }
     }
     fetchData();
@@ -163,6 +173,29 @@ export function LessonForm({ chapterId, data, courseId }: iAppProps) {
               </Button>
             </form>
           </Form>
+        </CardContent>
+      </Card>
+
+      <Separator className="my-6" />
+
+      {/* ================= INTERACTIVE ACTIVITIES SECTION ================= */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Interactive Activities (Optional)</CardTitle>
+          <CardDescription>Add documents for interactive activities</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoadingInteractiveActivities ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-sm text-muted-foreground">Loading interactive activities...</div>
+            </div>
+          ) : (
+            <InteractiveActivityManager
+              lessonId={data.id}
+              initialActivities={interactiveActivitiesData}
+              onActivityUpdate={(updated) => setInteractiveActivitiesData(updated)}
+            />
+          )}
         </CardContent>
       </Card>
 

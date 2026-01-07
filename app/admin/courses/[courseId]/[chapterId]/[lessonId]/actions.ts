@@ -8,7 +8,8 @@ import { lessonSchema, LessonSchemaType, quizSchema,
   reorderQuestionsSchema,
   QuizSchemaType,
   QuestionSchemaType,
-  ReorderQuestionsSchemaType, feedbackSchema,activitySchema,reorderActivitiesSchema,activityResourceSchema,reorderActivityResourcesSchema, type FeedbackSchemaType,resourceSchema, reorderResourcesSchema, type ResourceSchemaType, type ReorderResourcesSchemaType, type ActivitySchemaType, type ReorderActivitiesSchemaType, type ActivityResourceSchemaType, type ReorderActivityResourcesSchemaType } from "@/lib/zodSchema";
+  ReorderQuestionsSchemaType, feedbackSchema,activitySchema,reorderActivitiesSchema,activityResourceSchema,reorderActivityResourcesSchema, type FeedbackSchemaType,resourceSchema, reorderResourcesSchema, type ResourceSchemaType, type ReorderResourcesSchemaType, type ActivitySchemaType, type ReorderActivitiesSchemaType, type ActivityResourceSchemaType, type ReorderActivityResourcesSchemaType,
+  interactiveActivitySchema, reorderInteractiveActivitiesSchema, type InteractiveActivitySchemaType, type ReorderInteractiveActivitiesSchemaType } from "@/lib/zodSchema";
 
 import { revalidatePath } from "next/cache";
 
@@ -822,6 +823,234 @@ export async function reorderResources(
     return {
       status: "error",
       message: "Failed to reorder resources",
+    };
+  }
+}
+
+// Interactive Activity Actions
+export async function getInteractiveActivitiesData(lessonId: string) {
+  await requireAdmin();
+
+  try {
+    const activities = await prisma.interactiveActivity.findMany({
+      where: {
+        lessonId: lessonId,
+      },
+      orderBy: {
+        position: 'asc',
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        documentKey: true,
+        position: true,
+      },
+    });
+
+    return activities;
+  } catch (error) {
+    console.error("Failed to fetch interactive activities:", error);
+    return null;
+  }
+}
+
+export async function createInteractiveActivity(
+  values: InteractiveActivitySchemaType
+): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const result = interactiveActivitySchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid data",
+      };
+    }
+
+    const maxPos = await prisma.interactiveActivity.findFirst({
+      where: {
+        lessonId: result.data.lessonId,
+      },
+      select: {
+        position: true,
+      },
+      orderBy: {
+        position: 'desc',
+      },
+    });
+
+    await prisma.interactiveActivity.create({
+      data: {
+        title: result.data.title,
+        description: result.data.description,
+        documentKey: result.data.documentKey,
+        lessonId: result.data.lessonId,
+        position: (maxPos?.position ?? 0) + 1,
+      },
+    });
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: "success",
+      message: "Interactive activity created successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to create interactive activity",
+    };
+  }
+}
+
+export async function updateInteractiveActivity(
+  values: InteractiveActivitySchemaType,
+  activityId: string
+): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const result = interactiveActivitySchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid data",
+      };
+    }
+
+    await prisma.interactiveActivity.update({
+      where: {
+        id: activityId,
+      },
+      data: {
+        title: result.data.title,
+        description: result.data.description,
+        documentKey: result.data.documentKey,
+      },
+    });
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: "success",
+      message: "Interactive activity updated successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to update interactive activity",
+    };
+  }
+}
+
+export async function deleteInteractiveActivity({
+  activityId,
+  lessonId,
+}: {
+  activityId: string;
+  lessonId: string;
+}): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const lessonWithActivities = await prisma.lesson.findUnique({
+      where: {
+        id: lessonId,
+      },
+      select: {
+        interactiveActivities: {
+          orderBy: {
+            position: 'asc',
+          },
+          select: {
+            id: true,
+            position: true,
+          },
+        },
+      },
+    });
+
+    if (!lessonWithActivities) {
+      return {
+        status: 'error',
+        message: 'Lesson not found.',
+      };
+    }
+
+    const activities = lessonWithActivities.interactiveActivities;
+    const activityToDelete = activities.find((a) => a.id === activityId);
+
+    if (!activityToDelete) {
+      return {
+        status: 'error',
+        message: 'Interactive activity not found.',
+      };
+    }
+
+    const remainingActivities = activities.filter((a) => a.id !== activityId);
+    const updates = remainingActivities.map((activity, index) =>
+      prisma.interactiveActivity.update({
+        where: { id: activity.id },
+        data: { position: index + 1 },
+      })
+    );
+
+    await prisma.$transaction([
+      ...updates,
+      prisma.interactiveActivity.delete({
+        where: { id: activityId },
+      }),
+    ]);
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: 'success',
+      message: 'Interactive activity deleted successfully.',
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to delete interactive activity.",
+    };
+  }
+}
+
+export async function reorderInteractiveActivities(
+  values: ReorderInteractiveActivitiesSchemaType
+): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const result = reorderInteractiveActivitiesSchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid data",
+      };
+    }
+
+    const updates = result.data.interactiveActivities.map((activity) =>
+      prisma.interactiveActivity.update({
+        where: {
+          id: activity.id,
+        },
+        data: {
+          position: activity.position,
+        },
+      })
+    );
+
+    await prisma.$transaction(updates);
+    revalidatePath(`/admin/courses`);
+
+    return {
+      status: "success",
+      message: "Interactive activities reordered successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to reorder interactive activities",
     };
   }
 }

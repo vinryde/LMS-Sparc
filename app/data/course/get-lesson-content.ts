@@ -124,6 +124,18 @@ export async function getLessonContent(lessonId:string){
                position: true,
              },
            },
+           interactiveActivities: {
+             orderBy: {
+               position: 'asc',
+             },
+             select: {
+               id: true,
+               title: true,
+               description: true,
+               documentKey: true,
+               position: true,
+             },
+           },
            chapter:{
             select:{
                 courseId: true,

@@ -164,6 +164,21 @@ model Lesson{
   feedback Feedback?
   resources Resource[]
   activities Activity[]
+  interactiveActivities InteractiveActivity[]
+}
+
+model InteractiveActivity {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  documentKey String
+  position    Int
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lessonId    String
 }
 
 model Enrollment{

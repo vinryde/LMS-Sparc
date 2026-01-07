@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { tryCatch } from "@/hooks/try-catch";
 import { useConstructUrl } from "@/hooks/use-construct-url";
-import { BookIcon, CheckCircle, FileText, Link as LinkIcon, ExternalLink, Image as ImageIcon, FileDown } from "lucide-react";
+import { BookIcon, CheckCircle, FileText, Link as LinkIcon, ExternalLink, Image as ImageIcon, FileDown, Layers, MousePointerClick, Library } from "lucide-react";
 import Link from "next/link";
 import { useTransition } from "react";
 import { toast } from "sonner";
@@ -96,17 +96,70 @@ return(
            )}
            {data.documentKey && (
            <Link href={document}  className="text-primary font-medium">
-                View Study Materials
+                View Additional Materials
             </Link>
+        )}
+        {data.interactiveActivities && data.interactiveActivities.length > 0 && (
+          <div className="mt-8">
+            <Card className="border-2">
+              <CardHeader>
+                <div className="flex items-start gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-full bg-indigo-500/10 shrink-0">
+                    <MousePointerClick className="size-5 text-indigo-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl">Interactive Activities</CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Engage with course materials
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {data.interactiveActivities.map((activity) => (
+                  <div key={activity.id} className="p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-base">{activity.title}</h3>
+                        {activity.description && (
+                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                            {activity.description}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        asChild
+                        variant="outline"
+                        size="sm"
+                        className="shrink-0"
+                      >
+                        <Link href={`/dashboard/interactive-activity/${activity.id}`}>
+                          View Document
+                        </Link>
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
         )}
         {data.activities && data.activities.length > 0 && (
                  <div className="mt-8">
                    <Card className="border-2">
+              
                      <CardHeader>
-                       <CardTitle className="text-xl">Activities</CardTitle>
-                       <p className="text-sm text-muted-foreground">
-                         Practice tasks to reinforce learning
-                       </p>
+                        <div className="flex items-start gap-3">
+                          <div className="flex size-10 items-center justify-center rounded-full bg-rose-500/10 shrink-0">
+                            <Layers className="size-5 text-rose-600" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-xl">Activities</CardTitle>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              Practice tasks to reinforce learning
+                            </p>
+                          </div>
+                        </div>
                      </CardHeader>
                      <CardContent className="space-y-4">
                        {data.activities.map((activity) => (
@@ -143,10 +196,17 @@ return(
            <div className="mt-8">
              <Card className="border-2">
                <CardHeader>
-                 <CardTitle className="text-xl">Resources</CardTitle>
-                 <p className="text-sm text-muted-foreground">
-                   Additional materials to help you learn
-                 </p>
+                  <div className="flex items-start gap-3">
+                    <div className="flex size-10 items-center justify-center rounded-full bg-emerald-500/10 shrink-0">
+                      <Library className="size-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl">Resources</CardTitle>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Additional materials to help you learn
+                      </p>
+                    </div>
+                  </div>
                </CardHeader>
                <CardContent className="space-y-4">
                  {data.resources.map((resource) => (

@@ -102,14 +102,14 @@ const data = {
 
 export function DashboardSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar collapsible="offcanvas"  {...props} >
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
+             >
               <Link href="/">
                 <Image src={ku} alt="CREATE" width={40} height={40} /> 
                 <span className="text-base font-semibold">CREATE LMS.</span>

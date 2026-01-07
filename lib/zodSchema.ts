@@ -193,6 +193,24 @@ export type ActivityResourceSchemaType = z.infer<typeof activityResourceSchema>;
 export type ReorderActivitiesSchemaType = z.infer<typeof reorderActivitiesSchema>;
 export type ReorderActivityResourcesSchemaType = z.infer<typeof reorderActivityResourcesSchema>;
 
+export const interactiveActivitySchema = z.object({
+  title: z.string().min(3, {message: "Title must be at least 3 characters long"}),
+  description: z.string().max(200, {message: "Description must be under 200 characters"}).optional(),
+  lessonId: z.string().uuid({message: "Invalid lesson id"}),
+  documentKey: z.string().min(1, {message: "Document is required"}),
+});
+
+export const reorderInteractiveActivitiesSchema = z.object({
+  lessonId: z.string().uuid(),
+  interactiveActivities: z.array(z.object({
+    id: z.string().uuid(),
+    position: z.number(),
+  })),
+});
+
+export type InteractiveActivitySchemaType = z.infer<typeof interactiveActivitySchema>;
+export type ReorderInteractiveActivitiesSchemaType = z.infer<typeof reorderInteractiveActivitiesSchema>;
+
 export type ResourceSchemaType = z.infer<typeof resourceSchema>;
 export type ReorderResourcesSchemaType = z.infer<typeof reorderResourcesSchema>;
 export type ResourceType = (typeof resourceTypes)[number];
