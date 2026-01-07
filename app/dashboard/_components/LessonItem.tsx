@@ -12,13 +12,16 @@ interface iAppProps{
     slug:string;
     isActive?:boolean;
     completed:boolean;
+    locked?: boolean;
 }
-export function LessonItem({lesson,slug,isActive,completed}:iAppProps){
+export function LessonItem({lesson,slug,isActive,completed,locked}:iAppProps){
+    const href = locked ? `/dashboard/locked?slug=${slug}` : `/dashboard/${slug}/${lesson.id}`;
     return(
-        <Link href={`/dashboard/${slug}/${lesson.id}`} className={buttonVariants({
+        <Link href={href} className={buttonVariants({
             variant:completed ? "secondary" : "outline",
             className:cn("w-full p-2.5 h-auto justify-start transition-all", completed && 'bg-green-300 dark:bg-green-900/30 border-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-800 dark:text-green-200',
-                isActive && !completed && 'bg-primary/10 dark:bg-primary/20 border-primary/50 hover:bg-primary/20 dark:hover:bg-primary/30 text-primary dark:text-primary-foreground'
+                isActive && !completed && 'bg-primary/10 dark:bg-primary/20 border-primary/50 hover:bg-primary/20 dark:hover:bg-primary/30 text-primary dark:text-primary-foreground',
+                locked && !completed && 'opacity-70'
             )
         }) }>
         <div className="flex items-center gap-2.5 w-full min-w-0 ">

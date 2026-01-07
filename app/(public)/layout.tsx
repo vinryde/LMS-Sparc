@@ -12,7 +12,7 @@ export default function LayoutPublic({children}:{children:ReactNode}){
         <SidebarProvider>
             <div>
                 <Navbar/>
-                <main className={`container mx-auto ${nopadding ? "px-0" : "xs:px-6 md:px-6 lg:px-8"} mb-32`}>
+                <main className={` mx-auto ${nopadding ? "px-0" : "xs:px-6 md:px-6 lg:px-8"} mb-32`}>
                     {children}
                 </main>
             </div>

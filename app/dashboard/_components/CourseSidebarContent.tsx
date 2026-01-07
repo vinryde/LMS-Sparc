@@ -20,6 +20,20 @@ export function CourseSidebarContent({ course, onItemClick }: iAppProps) {
     const currentLessonId = pathname.split("/").pop();
     const { totallessons, completedlessons, progressPercentage } = useCourseProgress({ courseData: course });
 
+    // Compute chapter gating: only unlock next if previous fully completed
+    const unlockedChapterIds = new Set<string>();
+    course.chapter.forEach((chapter, index) => {
+      if (index === 0) {
+        unlockedChapterIds.add(chapter.id);
+      } else {
+        const prev = course.chapter[index - 1];
+        const prevCompleted = prev.lesson.every((l) =>
+          l.lessonProgress.some((p) => p.completed)
+        );
+        if (prevCompleted) unlockedChapterIds.add(chapter.id);
+      }
+    });
+
     return (
         <div className="flex flex-col h-full">
             <div className="pb-4 px-4 border-b border-border">
@@ -84,6 +98,7 @@ export function CourseSidebarContent({ course, onItemClick }: iAppProps) {
                                         slug={course.slug}
                                         isActive={lesson.id === currentLessonId}
                                         completed={lesson.lessonProgress.find((progress) => progress.lessonId === lesson.id)?.completed || false}
+                                        locked={!unlockedChapterIds.has(chapter.id)}
                                     />
                                 </div>
                             ))}

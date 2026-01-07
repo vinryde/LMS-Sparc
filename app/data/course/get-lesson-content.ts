@@ -138,6 +138,8 @@ export async function getLessonContent(lessonId:string){
            },
            chapter:{
             select:{
+                id: true,
+                position: true,
                 courseId: true,
                 course:{
                     select:{
@@ -173,6 +175,36 @@ export async function getLessonContent(lessonId:string){
     const expired = await isEnrollmentExpired(session.user.id, lesson.chapter.courseId);
     if(expired){
         redirect(`/course-expired?courseId=${lesson.chapter.courseId}`);
+    }
+
+    // Chapter gating: require previous chapter completion
+    if (lesson.chapter.position && lesson.chapter.position > 1) {
+        const prevChapter = await prisma.chapter.findFirst({
+          where: {
+            courseId: lesson.chapter.courseId,
+            position: lesson.chapter.position - 1,
+          },
+          select: {
+            id: true,
+            title: true,
+            lesson: {
+              select: {
+                id: true,
+                lessonProgress: {
+                  where: { userId: session.user.id },
+                  select: { completed: true },
+                },
+              },
+            },
+          },
+        });
+
+        if (prevChapter) {
+          const allCompleted = prevChapter.lesson.every(l => l.lessonProgress.some(p => p.completed));
+          if (!allCompleted) {
+            redirect(`/dashboard/locked?slug=${lesson.chapter.course.slug}`);
+          }
+        }
     }
     
     return lesson;
