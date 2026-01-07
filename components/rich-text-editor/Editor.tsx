@@ -29,9 +29,13 @@ export function RichTextEditor({field}:{field:any}){
         return <div>Loading editor...</div>;
     }
     return(
-        <div className="w-full border border-input rounded-lg overflow-hidden dark:bg-input/30 ">
-            <Menubar editor={editor}/>
-            <EditorContent editor={editor} />
+        <div className="w-full border border-input rounded-lg dark:bg-input/30 relative">
+            <div className="sticky top-0 z-20 bg-background/95 dark:bg-input/50 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+                <Menubar editor={editor}/>
+            </div>
+            <div className="max-h-[70vh] overflow-y-auto">
+                <EditorContent editor={editor} />
+            </div>
         </div>
     )
 }

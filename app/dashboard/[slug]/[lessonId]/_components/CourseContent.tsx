@@ -7,7 +7,7 @@ import { tryCatch } from "@/hooks/try-catch";
 import { useConstructUrl } from "@/hooks/use-construct-url";
 import { BookIcon, CheckCircle, FileText, Link as LinkIcon, ExternalLink, Image as ImageIcon, FileDown, Layers, MousePointerClick, Library } from "lucide-react";
 import Link from "next/link";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { markLessonComplete } from "../actions";
 import { useConfetti } from '@/hooks/use-confetti';
@@ -24,6 +24,28 @@ export function CourseContent({data}:iAppProps){
     const {triggerConfetti} = useConfetti();
 
 
+const [showFullDescription, setShowFullDescription] = useState(false);
+function extractTextFromJson(json:any): string {
+  if (!json) return "";
+  const root = typeof json === "string" ? JSON.parse(json) : json;
+  function walk(node:any): string {
+    if (!node) return "";
+    let t = node.text ? node.text + " " : "";
+    if (Array.isArray(node.content)) for (const c of node.content) t += walk(c);
+    if (Array.isArray(node.children)) for (const c of node.children) t += walk(c);
+    return t;
+  }
+  return walk(root).trim();
+}
+function getPreviewText(desc:string, words:number): string {
+  const full = extractTextFromJson(JSON.parse(desc));
+  const arr = full.split(/\s+/);
+  return arr.length <= words ? full : arr.slice(0, words).join(" ") + "…";
+}
+function isOverWordCount(desc:string, words:number): boolean {
+  const full = extractTextFromJson(JSON.parse(desc));
+  return full.split(/\s+/).length > words;
+}
 function VideoPlayer({thumbnailKey,documentKey,videoKey}:{
     thumbnailKey: string,
     documentKey: string,
@@ -91,8 +113,21 @@ return(
         <div className="space-y-3 pt-3">
            <h1 className="text-3xl font-bold tracking-tight text-foreground">{data.title}</h1> 
            {data.description && (
-            <RenderDescriptionn json={JSON.parse(data.description)} />
-            
+            showFullDescription ? (
+              <>
+                <RenderDescriptionn json={JSON.parse(data.description)} />
+                {isOverWordCount(data.description, 100) && (
+                  <Button variant="link" size="sm" className="px-0" onClick={() => setShowFullDescription(false)}>Show less</Button>
+                )}
+              </>
+            ) : (
+              <>
+                <p className="text-muted-foreground">{getPreviewText(data.description, 100)}</p>
+                {isOverWordCount(data.description, 100) && (
+                  <Button variant="link" size="sm" className="px-0" onClick={() => setShowFullDescription(true)}>Read more</Button>
+                )}
+              </>
+            )
            )}
            {data.documentKey && (
            <Link href={document}  className="text-primary font-medium">
