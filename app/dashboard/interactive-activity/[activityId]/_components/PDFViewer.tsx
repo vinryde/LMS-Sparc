@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useConstructUrl } from "@/hooks/use-construct-url";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, FileText, Loader2, ZoomIn, ZoomOut } from "lucide-react";
+import { ArrowLeft, FileText, Loader2, Download, ZoomIn, ZoomOut } from "lucide-react";
 import Link from "next/link";
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
@@ -38,8 +38,9 @@ const pdfOptions = {
   cMapUrl: 'https://unpkg.com/pdfjs-dist@5.4.296/cmaps/',
   cMapPacked: true,
   standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@5.4.296/standard_fonts/',
-  disableStream: true,
-  disableAutoFetch: true,
+  disableRange: true,
+  disableStream: true, // Better for iOS
+  disableAutoFetch: true, // Prevent memory issues
 };
 
 interface PDFViewerProps {
@@ -60,6 +61,7 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
   const [debugInfo, setDebugInfo] = useState<string>("");
   const [isIOS, setIsIOS] = useState(false);
   const [scale, setScale] = useState<number>(1);
+  const [useCustomRenderer, setUseCustomRenderer] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -73,12 +75,12 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
     
     setIsIOS(isiOS);
     
+    // FORCE custom renderer on iOS
     if (isiOS) {
-      setDebugInfo(prev => prev + "\n🔴 iOS DETECTED - Using optimized settings");
-      // Lower scale for iOS to reduce memory
-      setScale(0.6);
+      setUseCustomRenderer(true);
+      setDebugInfo(prev => prev + "\n🔴 DETECTED iOS - FORCING CUSTOM RENDERER");
     } else {
-      setDebugInfo(prev => prev + "\n✅ Desktop detected");
+      setDebugInfo(prev => prev + "\n✅ Desktop detected - using canvas");
     }
     
     const fetchPdf = async () => {
@@ -91,12 +93,12 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
         const blob = await response.blob();
         const pdfBlob = new Blob([blob], { type: 'application/pdf' });
         setPdfFile(pdfBlob);
-        setDebugInfo(prev => prev + `\n✅ Blob loaded: ${blob.size} bytes`);
+        setDebugInfo(prev => prev + `\nBlob loaded: ${blob.size} bytes`);
       } catch (err) {
         console.error("PDF fetch error:", err);
         const msg = err instanceof Error ? err.message : "Failed to load PDF";
         setErrorMsg(msg);
-        setDebugInfo(prev => prev + `\n❌ Fetch Error: ${msg}`);
+        setDebugInfo(prev => prev + `\nFetch Error: ${msg}`);
         setLoading(false);
       }
     };
@@ -110,7 +112,15 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
         const container = document.getElementById('pdf-container');
         if (container) {
           const fullWidth = container.clientWidth - 40;
-          setContainerWidth(fullWidth);
+          setContainerWidth(prev => {
+            const newWidth = fullWidth;
+            if (Math.abs(prev - newWidth) < 5) return prev;
+            
+            // More conservative scale for iOS
+            const targetScale = isiOS ? Math.min(newWidth / 600, 0.8) : newWidth / 600;
+            setScale(Math.max(targetScale, 0.5)); // Minimum 0.5 scale
+            return newWidth;
+          });
         }
       }, 200);
     }
@@ -126,18 +136,153 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
     setLoading(false);
-    setDebugInfo(prev => prev + `\n✅ Doc Loaded: ${numPages} pages`);
+    setDebugInfo(prev => prev + `\nDoc Loaded: ${numPages} pages`);
   }
 
   function onDocumentLoadError(error: Error) {
     console.error("PDF Load Error:", error);
     setErrorMsg(error.message);
     setLoading(false);
-    setDebugInfo(prev => prev + `\n❌ Doc Load Error: ${error.message}`);
+    setDebugInfo(prev => prev + `\nDoc Load Error: ${error.message}`);
   }
 
   const handleZoomIn = () => setScale(prev => Math.min(prev + 0.2, 2));
-  const handleZoomOut = () => setScale(prev => Math.max(prev - 0.2, 0.4));
+  const handleZoomOut = () => setScale(prev => Math.max(prev - 0.2, 0.5));
+
+  // Custom renderer for iOS - renders page as image to avoid canvas memory issues
+  const customRenderer = useCallback(({ page, width, height, scale: pageScale }: any) => {
+    // Validate page object
+    if (!page || typeof page.getViewport !== 'function') {
+      console.error('Invalid page object passed to customRenderer:', page);
+      return (
+        <div className="p-8 text-center bg-red-100 border border-red-500 rounded">
+          <p className="text-red-700 font-bold">Error: Invalid page object</p>
+          <p className="text-sm">Page object: {JSON.stringify(page)}</p>
+        </div>
+      );
+    }
+
+    const CanvasRenderer = () => {
+      const [renderState, setRenderState] = useState<'loading' | 'success' | 'error'>('loading');
+      const canvasRef = useRef<HTMLCanvasElement>(null);
+
+      useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) {
+          setDebugInfo(prev => prev + "\n❌ Canvas ref is null");
+          return;
+        }
+
+        let viewport;
+        try {
+          viewport = page.getViewport({ scale: pageScale || 1.0 });
+        } catch (err) {
+          console.error('getViewport error:', err);
+          setRenderState('error');
+          setDebugInfo(prev => prev + `\n❌ getViewport failed: ${err}`);
+          return;
+        }
+
+        const context = canvas.getContext('2d', { 
+          alpha: false,
+          willReadFrequently: false,
+          desynchronized: true
+        });
+        
+        if (!context) {
+          setDebugInfo(prev => prev + "\n❌ Could not get canvas context");
+          setRenderState('error');
+          return;
+        }
+
+        // Set canvas size with device pixel ratio consideration
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = viewport.width * dpr;
+        canvas.height = viewport.height * dpr;
+        canvas.style.width = `${viewport.width}px`;
+        canvas.style.height = `${viewport.height}px`;
+        
+        context.scale(dpr, dpr);
+
+        const renderContext = {
+          canvasContext: context,
+          viewport: viewport,
+          background: 'white',
+        };
+
+        let cancelled = false;
+        setDebugInfo(prev => prev + `\n⏳ Starting custom render...`);
+
+        page.render(renderContext).promise
+          .then(() => {
+            if (!cancelled) {
+              setRenderState('success');
+              setDebugInfo(prev => prev + `\n✅ Custom render SUCCESS`);
+            }
+          })
+          .catch((err: Error) => {
+            if (!cancelled) {
+              setRenderState('error');
+              console.error('Custom render error:', err);
+              setDebugInfo(prev => prev + `\n❌ Custom render FAILED: ${err.message}`);
+            }
+          });
+
+        return () => {
+          cancelled = true;
+        };
+      }, []);
+
+      return (
+        <div style={{ 
+          width: '100%', 
+          height: 'auto',
+          position: 'relative',
+          backgroundColor: 'white',
+          minHeight: '400px'
+        }}>
+          <canvas
+            ref={canvasRef}
+            style={{
+              width: '100%',
+              height: 'auto',
+              display: 'block',
+              backgroundColor: 'white'
+            }}
+          />
+          {renderState === 'loading' && (
+            <div style={{ 
+              position: 'absolute', 
+              top: '50%', 
+              left: '50%', 
+              transform: 'translate(-50%, -50%)',
+              zIndex: 10
+            }}>
+              <Loader2 className="animate-spin" />
+              <p className="text-sm mt-2">Rendering page...</p>
+            </div>
+          )}
+          {renderState === 'error' && (
+            <div style={{ 
+              position: 'absolute', 
+              top: '50%', 
+              left: '50%', 
+              transform: 'translate(-50%, -50%)',
+              textAlign: 'center',
+              padding: '20px',
+              backgroundColor: 'white',
+              border: '1px solid red'
+            }}>
+              <p className="text-destructive font-bold">Canvas Render Failed</p>
+              <p className="text-xs mt-1">Check debug info below</p>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    return <CanvasRenderer />;
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-background pl-6 pr-6 pb-6">
@@ -176,26 +321,20 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
             <span className="text-sm font-medium">
               {numPages} {numPages === 1 ? 'page' : 'pages'}
             </span>
-            
-            {isIOS && (
-              <span className="text-xs text-orange-600 dark:text-orange-400 ml-2">
-                📱 Mobile: Showing limited pages
-              </span>
-            )}
           </div>
         )}
 
         {/* Debug Panel */}
-        <details className="text-xs text-muted-foreground bg-muted p-2 rounded">
+        <details className="text-xs text-muted-foreground bg-muted p-2 rounded" open>
           <summary className="font-bold cursor-pointer">
-            🔍 Debug Info
+            🔍 Debug Info (Mode: {useCustomRenderer ? '🔴 CUSTOM RENDERER (iOS)' : '✅ Canvas (Desktop)'})
           </summary>
           <pre className="whitespace-pre-wrap mt-2 text-xs">{debugInfo}</pre>
           <div className="mt-2 p-2 bg-yellow-100 dark:bg-yellow-900 rounded">
             <p className="font-bold">Quick Check:</p>
             <p>iOS Detected: {isIOS ? '✅ YES' : '❌ NO'}</p>
-            <p>Scale: {scale}</p>
-            <p>Pages: {numPages}</p>
+            <p>Custom Renderer Active: {useCustomRenderer ? '✅ YES' : '❌ NO'}</p>
+            <p>User Agent: {typeof window !== 'undefined' ? window.navigator.userAgent.substring(0, 50) : 'N/A'}...</p>
           </div>
         </details>
       </div>
@@ -232,85 +371,68 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
             }
             className="w-full flex flex-col items-center"
           >
-            {isIOS ? (
-              // iOS: Render only first 3 pages to avoid memory crash
-              Array.from(new Array(Math.min(numPages, 3)), (el, index) => (
-                <div key={`page_${index + 1}`} className="w-full max-w-4xl mb-4">
-                  <Page 
-                    pageNumber={index + 1}
-                    scale={scale}
-                    renderMode="canvas"
-                    className="shadow-lg bg-white mx-auto"
-                    renderTextLayer={true}
-                    renderAnnotationLayer={false}
-                    devicePixelRatio={1} // Force low DPI on iOS to save memory
-                    loading={
-                      <div className="flex items-center gap-2 p-8 bg-white min-h-[400px] justify-center">
-                        <Loader2 className="animate-spin" />
-                        Loading page {index + 1}...
-                      </div>
-                    }
-                    onLoadSuccess={(page) => {
-                      setDebugInfo(prev => prev + `\n✅ Page ${page.pageNumber} loaded`);
-                    }}
-                    onRenderSuccess={(page) => {
-                      setDebugInfo(prev => prev + `\n🎨 Page ${page.pageNumber} rendered!`);
-                    }}
-                    onRenderError={(err) => {
-                      console.error(`Page ${index + 1} render error:`, err);
-                      setDebugInfo(prev => prev + `\n❌ Page ${index + 1} error: ${err.message}`);
-                    }}
-                  />
-                  {index < Math.min(numPages, 3) - 1 && (
-                    <div className="h-px bg-border my-4" />
-                  )}
+            {useCustomRenderer ? (
+              // iOS/Mobile: Single page with custom renderer
+              <div className="w-full max-w-4xl">
+                <div className="mb-2 p-2 bg-blue-100 dark:bg-blue-900 rounded text-sm text-center">
+                  📱 Mobile Mode: Showing Page 1 only (iOS memory optimization)
                 </div>
-              ))
+                <Page 
+                  key={`page_1_${scale}_custom`}
+                  pageNumber={1}
+                  scale={scale}
+                  renderMode="custom"
+                  customRenderer={customRenderer}
+                  className="mb-4 shadow-lg"
+                  renderTextLayer={false} // Disable text layer to isolate canvas issues
+                  renderAnnotationLayer={false}
+                  loading={
+                    <div className="flex items-center gap-2 p-8 bg-white">
+                      <Loader2 className="animate-spin" />
+                      Loading page...
+                    </div>
+                  }
+                  onLoadSuccess={(page) => {
+                    setDebugInfo(prev => prev + `\n📄 Page ${page.pageNumber} structure loaded`);
+                  }}
+                  onRenderSuccess={(page) => {
+                    setDebugInfo(prev => prev + `\n🎨 Page ${page.pageNumber} render complete!`);
+                  }}
+                  onRenderError={(err) => {
+                    console.error(`Page render error:`, err);
+                    setDebugInfo(prev => prev + `\n💥 RENDER ERROR: ${err.message}`);
+                  }}
+                />
+              </div>
             ) : (
               // Desktop: Render all pages for scrolling
               Array.from(new Array(numPages), (el, index) => (
-                <div key={`page_${index + 1}`} className="w-full max-w-4xl mb-4">
-                  <Page 
-                    pageNumber={index + 1}
-                    scale={scale}
-                    renderMode="canvas"
-                    className="shadow-lg bg-white mx-auto"
-                    renderTextLayer={true}
-                    renderAnnotationLayer={true}
-                    loading={
-                      <div className="flex items-center gap-2 p-8 bg-white min-h-[400px] justify-center">
-                        <Loader2 className="animate-spin" />
-                        Loading page {index + 1}...
-                      </div>
-                    }
-                    onLoadSuccess={(page) => {
-                      setDebugInfo(prev => prev + `\n✅ Page ${page.pageNumber} loaded`);
-                    }}
-                    onRenderSuccess={(page) => {
-                      setDebugInfo(prev => prev + `\n🎨 Page ${page.pageNumber} rendered!`);
-                    }}
-                    onRenderError={(err) => {
-                      console.error(`Page ${index + 1} render error:`, err);
-                      setDebugInfo(prev => prev + `\n❌ Page ${index + 1} error: ${err.message}`);
-                    }}
-                  />
-                  {index < numPages - 1 && (
-                    <div className="h-px bg-border my-4" />
-                  )}
-                </div>
+                <Page 
+                  key={`page_${index + 1}_${scale}`}
+                  pageNumber={index + 1}
+                  scale={scale}
+                  renderMode="canvas"
+                  className="mb-4 shadow-lg bg-white"
+                  renderTextLayer={true}
+                  renderAnnotationLayer={true}
+                  loading={
+                    <div className="flex items-center gap-2 p-8">
+                      <Loader2 className="animate-spin" />
+                      Rendering page {index + 1}...
+                    </div>
+                  }
+                  onLoadSuccess={(page) => {
+                    setDebugInfo(prev => prev + `\nPage ${page.pageNumber} Loaded`);
+                  }}
+                  onRenderSuccess={(page) => {
+                    setDebugInfo(prev => prev + `\nPage ${page.pageNumber} Rendered`);
+                  }}
+                  onRenderError={(err) => {
+                    console.error(`Page ${index + 1} render error:`, err);
+                    setDebugInfo(prev => prev + `\nPage ${index + 1} Render Error: ${err.message}`);
+                  }}
+                />
               ))
-            )}
-            
-            {isIOS && numPages > 3 && (
-              <div className="mt-8 p-4 bg-orange-100 dark:bg-orange-900 rounded-lg text-center max-w-md">
-                <p className="font-semibold text-orange-800 dark:text-orange-200">
-                  📱 Mobile Limitation
-                </p>
-                <p className="text-sm text-orange-700 dark:text-orange-300 mt-2">
-                  Showing 3 of {numPages} pages to prevent crashes on mobile devices. 
-                  For full document access, please view on a desktop computer.
-                </p>
-              </div>
             )}
           </Document>
         ) : (
@@ -325,12 +447,23 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
         .react-pdf__Page__textContent {
           user-select: text;
           -webkit-user-select: text;
+          pointer-events: auto;
         }
         
-        .react-pdf__Page__canvas {
-          width: 100% !important;
-          height: auto !important;
-        }
+        /* Force text layer visibility on iOS */
+        ${isIOS ? `
+          .react-pdf__Page__textContent span {
+            color: black !important;
+            opacity: 1 !important;
+            background: transparent !important;
+          }
+          
+          /* Optimize canvas rendering */
+          .react-pdf__Page__canvas {
+            max-width: 100% !important;
+            height: auto !important;
+          }
+        ` : ''}
       `}</style>
     </div>
   );
