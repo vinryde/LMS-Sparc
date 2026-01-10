@@ -43,6 +43,8 @@ const pdfOptions = {
   cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.296/cmaps/',
   cMapPacked: true,
   standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.296/standard_fonts/',
+  disableFontFace: true, // Force text to be drawn as shapes to fix iOS rendering issues
+  disableRange: true, // Download entire file to avoid range request errors
 };
 
 interface PDFViewerProps {
@@ -60,9 +62,12 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
   const [isMounted, setIsMounted] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [pdfFile, setPdfFile] = useState<string | Blob | null>(null);
+  const [pixelRatio, setPixelRatio] = useState<number>(1);
 
   useEffect(() => {
     setIsMounted(true);
+    // Cap pixel ratio at 2 to avoid canvas memory limits on iOS
+    setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     
     // Fetch the PDF in the main thread to avoid Worker CORS/Fetch issues
     const fetchPdf = async () => {
@@ -163,9 +168,11 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
                 key={`page_${index + 1}`} 
                 pageNumber={index + 1} 
                 width={containerWidth}
+                devicePixelRatio={pixelRatio}
                 className="mb-4 shadow-lg bg-white"
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
+                onRenderError={(err) => console.error(`Page ${index + 1} render error:`, err)}
               />
             ))}
           </Document>
