@@ -36,7 +36,7 @@ if (typeof URL.parse === 'undefined') {
 }
 
 // Set up the worker for react-pdf
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// pdfjs.GlobalWorkerOptions.workerSrc will be set dynamically in the component to handle polyfills
 
 interface PDFViewerProps {
   documentKey: string;
@@ -51,6 +51,69 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
   const [loading, setLoading] = useState(true);
   const [containerWidth, setContainerWidth] = useState<number>(0);
   const [isMounted, setIsMounted] = useState(false);
+  const [workerLoaded, setWorkerLoaded] = useState(false);
+
+  useEffect(() => {
+    const setupWorker = async () => {
+      // If the worker is already set up, skip
+      if (pdfjs.GlobalWorkerOptions.workerSrc) {
+        setWorkerLoaded(true);
+        return;
+      }
+
+      const version = pdfjs.version;
+      const workerUrl = `//unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs`;
+
+      // Check if we need to polyfill Promise.withResolvers (missing in iOS < 17.4)
+      const needsPolyfill = typeof Promise.withResolvers === 'undefined';
+
+      if (needsPolyfill) {
+        try {
+          // Fetch the worker code
+          const response = await fetch(workerUrl);
+          if (!response.ok) throw new Error('Failed to fetch worker');
+          const workerCode = await response.text();
+
+          // Polyfill code to inject
+          const polyfill = `
+            if (typeof Promise.withResolvers === 'undefined') {
+              Promise.withResolvers = function () {
+                let resolve, reject;
+                const promise = new Promise((res, rej) => {
+                  resolve = res;
+                  reject = rej;
+                });
+                return { promise, resolve, reject };
+              };
+            }
+            if (typeof URL.parse === 'undefined') {
+              URL.parse = function (url, base) {
+                try {
+                  return new URL(url, base);
+                } catch {
+                  return null;
+                }
+              };
+            }
+          `;
+
+          // Create a blob with the polyfill prepended
+          const blob = new Blob([polyfill + workerCode], { type: 'text/javascript' });
+          pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(blob);
+        } catch (error) {
+          console.error("Failed to patch worker, falling back to standard URL", error);
+          pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+        }
+      } else {
+        // Modern browser, use standard URL
+        pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+      }
+      
+      setWorkerLoaded(true);
+    };
+
+    setupWorker();
+  }, []);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
@@ -104,7 +167,7 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
         className="flex-1 bg-muted/30 rounded-lg border flex flex-col items-center p-5 relative w-full"
         onContextMenu={(e) => e.preventDefault()}
       >
-        {isMounted ? (
+        {isMounted && workerLoaded ? (
           <Document
             file={documentUrl}
             onLoadSuccess={onDocumentLoadSuccess}
