@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useConstructUrl } from "@/hooks/use-construct-url";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, FileText, Loader2, Download, ZoomIn, ZoomOut } from "lucide-react";
+import { ArrowLeft, FileText, Loader2, ZoomIn, ZoomOut } from "lucide-react";
 import Link from "next/link";
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
@@ -39,8 +39,8 @@ const pdfOptions = {
   cMapPacked: true,
   standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@5.4.296/standard_fonts/',
   disableRange: true,
-  disableStream: true, // Better for iOS
-  disableAutoFetch: true, // Prevent memory issues
+  disableStream: true,
+  disableAutoFetch: true,
 };
 
 interface PDFViewerProps {
@@ -61,12 +61,11 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
   const [debugInfo, setDebugInfo] = useState<string>("");
   const [isIOS, setIsIOS] = useState(false);
   const [scale, setScale] = useState<number>(1);
-  const [useCustomRenderer, setUseCustomRenderer] = useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   useEffect(() => {
     setIsMounted(true);
     
-    // Enhanced iOS detection
     const userAgent = navigator.userAgent.toLowerCase();
     const platform = navigator.platform?.toLowerCase() || '';
     const isiOS = /iphone|ipad|ipod/.test(userAgent) || 
@@ -74,14 +73,7 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
                   !!(navigator.maxTouchPoints && navigator.maxTouchPoints > 1 && /macintosh/.test(userAgent));
     
     setIsIOS(isiOS);
-    
-    // FORCE custom renderer on iOS
-    if (isiOS) {
-      setUseCustomRenderer(true);
-      setDebugInfo(prev => prev + "\n🔴 DETECTED iOS - FORCING CUSTOM RENDERER");
-    } else {
-      setDebugInfo(prev => prev + "\n✅ Desktop detected - using canvas");
-    }
+    setDebugInfo(prev => prev + `\n${isiOS ? '🔴 iOS DETECTED' : '✅ Desktop detected'}`);
     
     const fetchPdf = async () => {
       try {
@@ -115,10 +107,8 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
           setContainerWidth(prev => {
             const newWidth = fullWidth;
             if (Math.abs(prev - newWidth) < 5) return prev;
-            
-            // More conservative scale for iOS
-            const targetScale = isiOS ? Math.min(newWidth / 600, 0.8) : newWidth / 600;
-            setScale(Math.max(targetScale, 0.5)); // Minimum 0.5 scale
+            const targetScale = isiOS ? Math.min(newWidth / 600, 1.2) : newWidth / 600;
+            setScale(Math.max(targetScale, 0.6));
             return newWidth;
           });
         }
@@ -148,141 +138,8 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
 
   const handleZoomIn = () => setScale(prev => Math.min(prev + 0.2, 2));
   const handleZoomOut = () => setScale(prev => Math.max(prev - 0.2, 0.5));
-
-  // Custom renderer for iOS - renders page as image to avoid canvas memory issues
-  const customRenderer = useCallback(({ page, width, height, scale: pageScale }: any) => {
-    // Validate page object
-    if (!page || typeof page.getViewport !== 'function') {
-      console.error('Invalid page object passed to customRenderer:', page);
-      return (
-        <div className="p-8 text-center bg-red-100 border border-red-500 rounded">
-          <p className="text-red-700 font-bold">Error: Invalid page object</p>
-          <p className="text-sm">Page object: {JSON.stringify(page)}</p>
-        </div>
-      );
-    }
-
-    const CanvasRenderer = () => {
-      const [renderState, setRenderState] = useState<'loading' | 'success' | 'error'>('loading');
-      const canvasRef = useRef<HTMLCanvasElement>(null);
-
-      useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) {
-          setDebugInfo(prev => prev + "\n❌ Canvas ref is null");
-          return;
-        }
-
-        let viewport;
-        try {
-          viewport = page.getViewport({ scale: pageScale || 1.0 });
-        } catch (err) {
-          console.error('getViewport error:', err);
-          setRenderState('error');
-          setDebugInfo(prev => prev + `\n❌ getViewport failed: ${err}`);
-          return;
-        }
-
-        const context = canvas.getContext('2d', { 
-          alpha: false,
-          willReadFrequently: false,
-          desynchronized: true
-        });
-        
-        if (!context) {
-          setDebugInfo(prev => prev + "\n❌ Could not get canvas context");
-          setRenderState('error');
-          return;
-        }
-
-        // Set canvas size with device pixel ratio consideration
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        canvas.width = viewport.width * dpr;
-        canvas.height = viewport.height * dpr;
-        canvas.style.width = `${viewport.width}px`;
-        canvas.style.height = `${viewport.height}px`;
-        
-        context.scale(dpr, dpr);
-
-        const renderContext = {
-          canvasContext: context,
-          viewport: viewport,
-          background: 'white',
-        };
-
-        let cancelled = false;
-        setDebugInfo(prev => prev + `\n⏳ Starting custom render...`);
-
-        page.render(renderContext).promise
-          .then(() => {
-            if (!cancelled) {
-              setRenderState('success');
-              setDebugInfo(prev => prev + `\n✅ Custom render SUCCESS`);
-            }
-          })
-          .catch((err: Error) => {
-            if (!cancelled) {
-              setRenderState('error');
-              console.error('Custom render error:', err);
-              setDebugInfo(prev => prev + `\n❌ Custom render FAILED: ${err.message}`);
-            }
-          });
-
-        return () => {
-          cancelled = true;
-        };
-      }, []);
-
-      return (
-        <div style={{ 
-          width: '100%', 
-          height: 'auto',
-          position: 'relative',
-          backgroundColor: 'white',
-          minHeight: '400px'
-        }}>
-          <canvas
-            ref={canvasRef}
-            style={{
-              width: '100%',
-              height: 'auto',
-              display: 'block',
-              backgroundColor: 'white'
-            }}
-          />
-          {renderState === 'loading' && (
-            <div style={{ 
-              position: 'absolute', 
-              top: '50%', 
-              left: '50%', 
-              transform: 'translate(-50%, -50%)',
-              zIndex: 10
-            }}>
-              <Loader2 className="animate-spin" />
-              <p className="text-sm mt-2">Rendering page...</p>
-            </div>
-          )}
-          {renderState === 'error' && (
-            <div style={{ 
-              position: 'absolute', 
-              top: '50%', 
-              left: '50%', 
-              transform: 'translate(-50%, -50%)',
-              textAlign: 'center',
-              padding: '20px',
-              backgroundColor: 'white',
-              border: '1px solid red'
-            }}>
-              <p className="text-destructive font-bold">Canvas Render Failed</p>
-              <p className="text-xs mt-1">Check debug info below</p>
-            </div>
-          )}
-        </div>
-      );
-    };
-
-    return <CanvasRenderer />;
-  }, []);
+  const handleNextPage = () => setCurrentPage(prev => Math.min(prev + 1, numPages));
+  const handlePrevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
 
   return (
     <div className="flex flex-col min-h-screen bg-background pl-6 pr-6 pb-6">
@@ -318,22 +175,47 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
             
             <div className="h-6 w-px bg-border mx-2" />
             
-            <span className="text-sm font-medium">
-              {numPages} {numPages === 1 ? 'page' : 'pages'}
-            </span>
+            {isIOS && (
+              <>
+                <Button 
+                  onClick={handlePrevPage} 
+                  size="sm" 
+                  variant="outline"
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+                <span className="text-sm font-medium">
+                  Page {currentPage} of {numPages}
+                </span>
+                <Button 
+                  onClick={handleNextPage} 
+                  size="sm" 
+                  variant="outline"
+                  disabled={currentPage === numPages}
+                >
+                  Next
+                </Button>
+              </>
+            )}
+            
+            {!isIOS && (
+              <span className="text-sm font-medium">
+                {numPages} {numPages === 1 ? 'page' : 'pages'}
+              </span>
+            )}
           </div>
         )}
 
         {/* Debug Panel */}
-        <details className="text-xs text-muted-foreground bg-muted p-2 rounded" open>
+        <details className="text-xs text-muted-foreground bg-muted p-2 rounded">
           <summary className="font-bold cursor-pointer">
-            🔍 Debug Info (Mode: {useCustomRenderer ? '🔴 CUSTOM RENDERER (iOS)' : '✅ Canvas (Desktop)'})
+            🔍 Debug Info (Mode: {isIOS ? '📱 iOS Mobile' : '💻 Desktop'})
           </summary>
           <pre className="whitespace-pre-wrap mt-2 text-xs">{debugInfo}</pre>
           <div className="mt-2 p-2 bg-yellow-100 dark:bg-yellow-900 rounded">
             <p className="font-bold">Quick Check:</p>
             <p>iOS Detected: {isIOS ? '✅ YES' : '❌ NO'}</p>
-            <p>Custom Renderer Active: {useCustomRenderer ? '✅ YES' : '❌ NO'}</p>
             <p>User Agent: {typeof window !== 'undefined' ? window.navigator.userAgent.substring(0, 50) : 'N/A'}...</p>
           </div>
         </details>
@@ -371,36 +253,34 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
             }
             className="w-full flex flex-col items-center"
           >
-            {useCustomRenderer ? (
-              // iOS/Mobile: Single page with custom renderer
+            {isIOS ? (
+              // iOS: Show one page at a time with navigation
               <div className="w-full max-w-4xl">
                 <div className="mb-2 p-2 bg-blue-100 dark:bg-blue-900 rounded text-sm text-center">
-                  📱 Mobile Mode: Showing Page 1 only (iOS memory optimization)
+                  📱 Mobile Mode: Page {currentPage} of {numPages}
                 </div>
                 <Page 
-                  key={`page_1_${scale}_custom`}
-                  pageNumber={1}
+                  key={`page_${currentPage}_${scale}`}
+                  pageNumber={currentPage}
                   scale={scale}
-                  renderMode="custom"
-                  customRenderer={customRenderer}
-                  className="mb-4 shadow-lg"
-                  renderTextLayer={false} // Disable text layer to isolate canvas issues
+                  renderTextLayer={true}
                   renderAnnotationLayer={false}
+                  className="shadow-lg bg-white mb-4"
                   loading={
-                    <div className="flex items-center gap-2 p-8 bg-white">
+                    <div className="flex items-center gap-2 p-8 bg-white min-h-[400px] justify-center">
                       <Loader2 className="animate-spin" />
-                      Loading page...
+                      Loading page {currentPage}...
                     </div>
                   }
                   onLoadSuccess={(page) => {
-                    setDebugInfo(prev => prev + `\n📄 Page ${page.pageNumber} structure loaded`);
+                    setDebugInfo(prev => prev + `\n📄 Page ${page.pageNumber} loaded`);
                   }}
                   onRenderSuccess={(page) => {
-                    setDebugInfo(prev => prev + `\n🎨 Page ${page.pageNumber} render complete!`);
+                    setDebugInfo(prev => prev + `\n🎨 Page ${page.pageNumber} rendered`);
                   }}
                   onRenderError={(err) => {
-                    console.error(`Page render error:`, err);
-                    setDebugInfo(prev => prev + `\n💥 RENDER ERROR: ${err.message}`);
+                    console.error(`Page ${currentPage} render error:`, err);
+                    setDebugInfo(prev => prev + `\n💥 Page ${currentPage} ERROR: ${err.message}`);
                   }}
                 />
               </div>
@@ -416,7 +296,7 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
                   renderTextLayer={true}
                   renderAnnotationLayer={true}
                   loading={
-                    <div className="flex items-center gap-2 p-8">
+                    <div className="flex items-center gap-2 p-8 min-h-[400px] justify-center">
                       <Loader2 className="animate-spin" />
                       Rendering page {index + 1}...
                     </div>
@@ -450,20 +330,16 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
           pointer-events: auto;
         }
         
-        /* Force text layer visibility on iOS */
-        ${isIOS ? `
-          .react-pdf__Page__textContent span {
-            color: black !important;
-            opacity: 1 !important;
-            background: transparent !important;
-          }
-          
-          /* Optimize canvas rendering */
-          .react-pdf__Page__canvas {
-            max-width: 100% !important;
-            height: auto !important;
-          }
-        ` : ''}
+        .react-pdf__Page__canvas {
+          max-width: 100% !important;
+          height: auto !important;
+        }
+        
+        /* Better text rendering on iOS */
+        .react-pdf__Page__textContent span {
+          color: transparent !important;
+          position: absolute;
+        }
       `}</style>
     </div>
   );
