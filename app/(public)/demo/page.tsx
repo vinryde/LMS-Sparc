@@ -1,6 +1,12 @@
 import { Web3HeroSection } from "@/components/web3-hero-section";
 import { PointerHighlight } from "@/components/pointer-highlight";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
+import EarbudShowcase from "@/components/spatial-product-showcase";
+import { Testimonial } from "@/components/design-testimonial"
+import FeaturesSectionMinimal from "@/components/bento-monochrome";
+import FeaturesSectionMinimalClimate from "@/components/bento-climate";
+import { MagicText } from "@/components/ui/magic-text";
+
 export default function Demo(){
   const words= "CREATE transforms education into a tool for climate action and energy awareness. Through research-driven learning, teacher training, and international collaboration, we equip participants with the skills to integrate climate and energy concepts into classrooms, research projects, and community initiatives. Our vision is to create a world where sustainability education inspires innovation, responsibility, and collective action for ecological well-being."
     return (
@@ -20,6 +26,23 @@ export default function Demo(){
             
           </div>
           </div>
+          <div>
+          <EarbudShowcase/>
+          </div>
+          <div>
+            <Testimonial />
+          </div>
+          <FeaturesSectionMinimal/>
+          <div className="mx-2 font-semibold md:mx-10">
+            <MagicText
+          text={
+          "CREATE(Climate Science Research, Energy Education and Training for Ecological Sustainability) is an educational initiative committed to building a climate-literate and energy-conscious society. Our core aim is to empower learners, educators, and communities with knowledge, skills, and awareness to address global climate and energy challenges responsibly. Through focused courses in Energy Education and Climate Science, CREATE promotes informed decision-making, innovation, and sustainable action. Guided by the belief that education drives change, CREATE embraces its mottos: Save energy, save the future. Small changes create big impact. Be energy smart, embrace efficiency, choose renewables, and turn off unnecessary lights to protect the future and build responsible, sustainable communities."
+        }
+        />
+          
+      </div>
+          <FeaturesSectionMinimalClimate/>
+
       
     </div>
     )
