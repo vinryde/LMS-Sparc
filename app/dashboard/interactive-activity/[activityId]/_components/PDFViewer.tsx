@@ -11,7 +11,7 @@ import 'react-pdf/dist/Page/TextLayer.css';
 
 // Polyfill for Promise.withResolvers
 if (typeof Promise.withResolvers === 'undefined') {
-  
+ 
   Promise.withResolvers = function <T>() {
     let resolve!: (value: T | PromiseLike<T>) => void;
     let reject!: (reason?: any) => void;
@@ -20,6 +20,18 @@ if (typeof Promise.withResolvers === 'undefined') {
       reject = rej;
     });
     return { promise, resolve, reject };
+  };
+}
+
+// Polyfill for URL.parse
+if (typeof URL.parse === 'undefined') {
+  
+  URL.parse = function (url: string, base?: string) {
+    try {
+      return new URL(url, base);
+    } catch {
+      return null;
+    }
   };
 }
 
@@ -38,6 +50,7 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
   const [numPages, setNumPages] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [containerWidth, setContainerWidth] = useState<number>(0);
+  const [isMounted, setIsMounted] = useState(false);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
@@ -46,6 +59,8 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
 
   // Simple responsive width handler
   useEffect(() => {
+    setIsMounted(true);
+
     function handleResize() {
       const container = document.getElementById('pdf-container');
       if (container) {
@@ -89,32 +104,38 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
         className="flex-1 bg-muted/30 rounded-lg border flex flex-col items-center p-5 relative w-full"
         onContextMenu={(e) => e.preventDefault()}
       >
-        <Document
-          file={documentUrl}
-          onLoadSuccess={onDocumentLoadSuccess}
-          loading={
-            <div className="flex items-center gap-2 mt-10">
-              <Loader2 className="animate-spin" /> Loading PDF...
-            </div>
-          }
-          error={
-            <div className="text-destructive mt-10 font-medium">
-              Failed to load document.
-            </div>
-          }
-          className="w-full flex flex-col items-center"
-        >
-          {Array.from(new Array(numPages), (el, index) => (
-            <Page 
-              key={`page_${index + 1}`} 
-              pageNumber={index + 1} 
-              width={containerWidth}
-              className="mb-4 shadow-lg bg-white"
-              renderTextLayer={false}
-              renderAnnotationLayer={false}
-            />
-          ))}
-        </Document>
+        {isMounted ? (
+          <Document
+            file={documentUrl}
+            onLoadSuccess={onDocumentLoadSuccess}
+            loading={
+              <div className="flex items-center gap-2 mt-10">
+                <Loader2 className="animate-spin" /> Loading PDF...
+              </div>
+            }
+            error={
+              <div className="text-destructive mt-10 font-medium">
+                Failed to load document.
+              </div>
+            }
+            className="w-full flex flex-col items-center"
+          >
+            {Array.from(new Array(numPages), (el, index) => (
+              <Page 
+                key={`page_${index + 1}`} 
+                pageNumber={index + 1} 
+                width={containerWidth}
+                className="mb-4 shadow-lg bg-white"
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
+              />
+            ))}
+          </Document>
+        ) : (
+          <div className="flex items-center gap-2 mt-10">
+            <Loader2 className="animate-spin" /> Initializing PDF Viewer...
+          </div>
+        )}
       </div>
     </div>
   );
