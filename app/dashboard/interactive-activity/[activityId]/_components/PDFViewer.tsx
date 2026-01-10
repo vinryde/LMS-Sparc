@@ -64,6 +64,7 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
   const [pixelRatio, setPixelRatio] = useState<number>(1);
   const [debugInfo, setDebugInfo] = useState<string>("");
   const [isMobile, setIsMobile] = useState(false);
+  const [scale, setScale] = useState<number>(1);
 
   useEffect(() => {
     setIsMounted(true);
@@ -104,6 +105,11 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
         const fullWidth = container.clientWidth - 40; // 40px for padding
         setContainerWidth(isDesktop ? fullWidth * 0.9 : fullWidth);
         setDebugInfo(prev => prev + `\nResize: ${fullWidth}px`);
+        
+        // Calculate scale based on a standard A4 width (approx 600px)
+        // Ensure minimum scale of 0.6 on mobile to prevent text culling
+        const targetScale = fullWidth / 600; 
+        setScale(targetScale < 0.6 && !isDesktop ? 0.6 : targetScale);
       }
     }
 
@@ -160,12 +166,28 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
           <summary>Debug Info (Click to expand)</summary>
           <pre className="whitespace-pre-wrap mt-2">{debugInfo}</pre>
         </details>
+      
+        {/* Mobile Text Layer Fallback Styles */}
+        <style jsx global>{`
+          .react-pdf__Page__textContent {
+            user-select: text;
+            -webkit-user-select: text;
+            pointer-events: auto;
+          }
+          /* On mobile, force text layer to be visible (black) to compensate for missing canvas text */
+          ${isMobile ? `
+            .react-pdf__Page__textContent span {
+              color: black !important;
+              opacity: 1 !important;
+            }
+          ` : ''}
+        `}</style>
       </div>
 
       {/* PDF Viewer Area */}
       <div 
         id="pdf-container"
-        className="flex-1 bg-muted/30 rounded-lg border flex flex-col items-center p-5 relative w-full"
+        className="flex-1 bg-muted/30 rounded-lg border flex flex-col items-center p-5 relative w-full overflow-auto"
         onContextMenu={(e) => e.preventDefault()}
       >
         {isMounted && pdfFile ? (
@@ -189,12 +211,12 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
           >
             {Array.from(new Array(numPages), (el, index) => (
               <Page 
-                key={`page_${index + 1}_${containerWidth}_${pixelRatio}`} 
+                key={`page_${index + 1}_${scale}_${pixelRatio}`} 
                 pageNumber={index + 1} 
-                width={containerWidth}
+                scale={scale}
                 devicePixelRatio={pixelRatio}
                 className="mb-4 shadow-lg bg-white"
-                renderTextLayer={!isMobile} 
+                renderTextLayer={true} 
                 renderAnnotationLayer={!isMobile}
                 onLoadSuccess={onPageLoadSuccess}
                 onRenderSuccess={onPageRenderSuccess}
