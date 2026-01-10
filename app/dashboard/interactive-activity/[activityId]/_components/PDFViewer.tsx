@@ -43,7 +43,6 @@ const pdfOptions = {
   cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.296/cmaps/',
   cMapPacked: true,
   standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.296/standard_fonts/',
-  disableFontFace: true, // Force text to be drawn as shapes to fix iOS rendering issues
   disableRange: true, // Download entire file to avoid range request errors
 };
 
@@ -66,8 +65,9 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
 
   useEffect(() => {
     setIsMounted(true);
-    // Cap pixel ratio at 2 to avoid canvas memory limits on iOS
-    setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    // Cap pixel ratio at 1 for mobile to avoid canvas memory limits, 2 for desktop high-DPI
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2));
     
     // Fetch the PDF in the main thread to avoid Worker CORS/Fetch issues
     const fetchPdf = async () => {
@@ -78,7 +78,9 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
           throw new Error(`Failed to fetch PDF: ${response.status} ${response.statusText}`);
         }
         const blob = await response.blob();
-        setPdfFile(blob);
+        // Ensure blob is treated as PDF
+        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+        setPdfFile(pdfBlob);
       } catch (err) {
         console.error("Main thread PDF fetch error:", err);
         setErrorMsg(err instanceof Error ? err.message : "Failed to load PDF file");
@@ -165,7 +167,7 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
           >
             {Array.from(new Array(numPages), (el, index) => (
               <Page 
-                key={`page_${index + 1}`} 
+                key={`page_${index + 1}_${containerWidth}`} 
                 pageNumber={index + 1} 
                 width={containerWidth}
                 devicePixelRatio={pixelRatio}
