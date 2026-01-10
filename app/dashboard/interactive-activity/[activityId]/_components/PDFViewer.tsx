@@ -40,10 +40,10 @@ if (typeof URL.parse === 'undefined') {
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf-worker.mjs?v=5.4.296';
 
 const pdfOptions = {
-  cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.296/cmaps/',
+  cMapUrl: 'https://unpkg.com/pdfjs-dist@5.4.296/cmaps/',
   cMapPacked: true,
-  standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.296/standard_fonts/',
-  disableRange: true, // Download entire file to avoid range request errors
+  standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@5.4.296/standard_fonts/',
+  disableRange: true,
 };
 
 interface PDFViewerProps {
@@ -62,12 +62,16 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [pdfFile, setPdfFile] = useState<string | Blob | null>(null);
   const [pixelRatio, setPixelRatio] = useState<number>(1);
+  const [debugInfo, setDebugInfo] = useState<string>("");
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
+    
+    const checkMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    setIsMobile(checkMobile);
     // Cap pixel ratio at 1 for mobile to avoid canvas memory limits, 2 for desktop high-DPI
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2));
+    setPixelRatio(checkMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2));
     
     // Fetch the PDF in the main thread to avoid Worker CORS/Fetch issues
     const fetchPdf = async () => {
@@ -81,16 +85,17 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
         // Ensure blob is treated as PDF
         const pdfBlob = new Blob([blob], { type: 'application/pdf' });
         setPdfFile(pdfBlob);
+        setDebugInfo(prev => prev + `\nBlob loaded: ${blob.size} bytes`);
       } catch (err) {
         console.error("Main thread PDF fetch error:", err);
-        setErrorMsg(err instanceof Error ? err.message : "Failed to load PDF file");
+        const msg = err instanceof Error ? err.message : "Failed to load PDF file";
+        setErrorMsg(msg);
+        setDebugInfo(prev => prev + `\nFetch Error: ${msg}`);
         setLoading(false);
       }
     };
 
-    if (documentUrl) {
-      fetchPdf();
-    }
+    fetchPdf();
 
     function handleResize() {
       const container = document.getElementById('pdf-container');
@@ -98,6 +103,7 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
         const isDesktop = window.innerWidth >= 1024; // lg breakpoint
         const fullWidth = container.clientWidth - 40; // 40px for padding
         setContainerWidth(isDesktop ? fullWidth * 0.9 : fullWidth);
+        setDebugInfo(prev => prev + `\nResize: ${fullWidth}px`);
       }
     }
 
@@ -109,12 +115,22 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
     setLoading(false);
+    setDebugInfo(prev => prev + `\nDoc Loaded: ${numPages} pages`);
   }
 
   function onDocumentLoadError(error: Error) {
     console.error("PDF Load Error:", error);
     setErrorMsg(error.message);
     setLoading(false);
+    setDebugInfo(prev => prev + `\nDoc Load Error: ${error.message}`);
+  }
+
+  function onPageLoadSuccess(page: any) {
+    setDebugInfo(prev => prev + `\nPage ${page.pageNumber} Loaded`);
+  }
+
+  function onPageRenderSuccess(page: any) {
+    setDebugInfo(prev => prev + `\nPage ${page.pageNumber} Rendered`);
   }
 
   return (
@@ -138,6 +154,12 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
         {description && (
           <p className="text-muted-foreground text-lg">{description}</p>
         )}
+        
+        {/* Debug Info Panel - Visible only if there are errors or loading issues */}
+        <details className="text-xs text-muted-foreground bg-muted p-2 rounded mt-2">
+          <summary>Debug Info (Click to expand)</summary>
+          <pre className="whitespace-pre-wrap mt-2">{debugInfo}</pre>
+        </details>
       </div>
 
       {/* PDF Viewer Area */}
@@ -167,14 +189,26 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
           >
             {Array.from(new Array(numPages), (el, index) => (
               <Page 
-                key={`page_${index + 1}_${containerWidth}`} 
+                key={`page_${index + 1}_${containerWidth}_${pixelRatio}`} 
                 pageNumber={index + 1} 
                 width={containerWidth}
                 devicePixelRatio={pixelRatio}
                 className="mb-4 shadow-lg bg-white"
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-                onRenderError={(err) => console.error(`Page ${index + 1} render error:`, err)}
+                renderTextLayer={!isMobile} 
+                renderAnnotationLayer={!isMobile}
+                onLoadSuccess={onPageLoadSuccess}
+                onRenderSuccess={onPageRenderSuccess}
+                onGetTextSuccess={(text) => {
+                  setDebugInfo(prev => prev + `\nPage ${index + 1} Text Items: ${text.items.length}`);
+                }}
+                onGetTextError={(err) => {
+                  console.error(`Page ${index + 1} text error:`, err);
+                  setDebugInfo(prev => prev + `\nPage ${index + 1} Text Error: ${err.message}`);
+                }}
+                onRenderError={(err) => {
+                  console.error(`Page ${index + 1} render error:`, err);
+                  setDebugInfo(prev => prev + `\nPage ${index + 1} Render Error: ${err.message}`);
+                }}
               />
             ))}
           </Document>
