@@ -203,7 +203,15 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
         className="flex-1 bg-muted/30 rounded-lg border flex flex-col items-center p-5 relative w-full overflow-auto"
         onContextMenu={(e) => e.preventDefault()}
       >
-        {isMounted && pdfFile ? (
+        {errorMsg ? (
+          <div className="flex flex-col items-center justify-center gap-2 mt-10 text-destructive p-4 text-center">
+            <p className="font-bold">Failed to load document.</p>
+            <p className="text-sm">{errorMsg}</p>
+            <Button variant="outline" onClick={() => window.location.reload()} className="mt-4">
+              Retry
+            </Button>
+          </div>
+        ) : isMounted && pdfFile ? (
           <Document
             file={pdfFile}
             options={pdfOptions}
@@ -228,7 +236,8 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
                 pageNumber={index + 1} 
                 scale={scale}
                 devicePixelRatio={pixelRatio}
-                className="mb-4 shadow-lg bg-white"
+                className="mb-4 shadow-lg" // Removed bg-white to prevent covering
+                 // Ensure canvas doesn't paint a white block
                 renderTextLayer={true} 
                 renderAnnotationLayer={!isMobile}
                 onLoadSuccess={onPageLoadSuccess}
