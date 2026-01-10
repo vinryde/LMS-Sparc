@@ -36,7 +36,8 @@ if (typeof URL.parse === 'undefined') {
 }
 
 // Set up the worker for react-pdf
-// pdfjs.GlobalWorkerOptions.workerSrc will be set dynamically in the component to handle polyfills
+// Use local shim to ensure polyfills are loaded before worker
+pdfjs.GlobalWorkerOptions.workerSrc = '/pdf-worker.mjs?v=5.4.296';
 
 interface PDFViewerProps {
   documentKey: string;
@@ -51,78 +52,32 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
   const [loading, setLoading] = useState(true);
   const [containerWidth, setContainerWidth] = useState<number>(0);
   const [isMounted, setIsMounted] = useState(false);
-  const [workerLoaded, setWorkerLoaded] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [pdfFile, setPdfFile] = useState<string | Blob | null>(null);
 
-  useEffect(() => {
-    const setupWorker = async () => {
-      // If the worker is already set up, skip
-      if (pdfjs.GlobalWorkerOptions.workerSrc) {
-        setWorkerLoaded(true);
-        return;
-      }
-
-      const version = pdfjs.version;
-      const workerUrl = `//unpkg.com/pdfjs-dist@${version}/build/pdf.worker.min.mjs`;
-
-      // Check if we need to polyfill Promise.withResolvers (missing in iOS < 17.4)
-      const needsPolyfill = typeof Promise.withResolvers === 'undefined';
-
-      if (needsPolyfill) {
-        try {
-          // Fetch the worker code
-          const response = await fetch(workerUrl);
-          if (!response.ok) throw new Error('Failed to fetch worker');
-          const workerCode = await response.text();
-
-          // Polyfill code to inject
-          const polyfill = `
-            if (typeof Promise.withResolvers === 'undefined') {
-              Promise.withResolvers = function () {
-                let resolve, reject;
-                const promise = new Promise((res, rej) => {
-                  resolve = res;
-                  reject = rej;
-                });
-                return { promise, resolve, reject };
-              };
-            }
-            if (typeof URL.parse === 'undefined') {
-              URL.parse = function (url, base) {
-                try {
-                  return new URL(url, base);
-                } catch {
-                  return null;
-                }
-              };
-            }
-          `;
-
-          // Create a blob with the polyfill prepended
-          const blob = new Blob([polyfill + workerCode], { type: 'text/javascript' });
-          pdfjs.GlobalWorkerOptions.workerSrc = URL.createObjectURL(blob);
-        } catch (error) {
-          console.error("Failed to patch worker, falling back to standard URL", error);
-          pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
-        }
-      } else {
-        // Modern browser, use standard URL
-        pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
-      }
-      
-      setWorkerLoaded(true);
-    };
-
-    setupWorker();
-  }, []);
-
-  function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
-    setNumPages(numPages);
-    setLoading(false);
-  }
-
-  // Simple responsive width handler
   useEffect(() => {
     setIsMounted(true);
+    
+    // Fetch the PDF in the main thread to avoid Worker CORS/Fetch issues
+    const fetchPdf = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(documentUrl);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch PDF: ${response.status} ${response.statusText}`);
+        }
+        const blob = await response.blob();
+        setPdfFile(blob);
+      } catch (err) {
+        console.error("Main thread PDF fetch error:", err);
+        setErrorMsg(err instanceof Error ? err.message : "Failed to load PDF file");
+        setLoading(false);
+      }
+    };
+
+    if (documentUrl) {
+      fetchPdf();
+    }
 
     function handleResize() {
       const container = document.getElementById('pdf-container');
@@ -136,7 +91,18 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [documentUrl]);
+
+  function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
+    setNumPages(numPages);
+    setLoading(false);
+  }
+
+  function onDocumentLoadError(error: Error) {
+    console.error("PDF Load Error:", error);
+    setErrorMsg(error.message);
+    setLoading(false);
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-background pl-6 pr-6 pb-6">
@@ -167,18 +133,20 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
         className="flex-1 bg-muted/30 rounded-lg border flex flex-col items-center p-5 relative w-full"
         onContextMenu={(e) => e.preventDefault()}
       >
-        {isMounted && workerLoaded ? (
+        {isMounted && pdfFile ? (
           <Document
-            file={documentUrl}
+            file={pdfFile}
             onLoadSuccess={onDocumentLoadSuccess}
+            onLoadError={onDocumentLoadError}
             loading={
               <div className="flex items-center gap-2 mt-10">
                 <Loader2 className="animate-spin" /> Loading PDF...
               </div>
             }
             error={
-              <div className="text-destructive mt-10 font-medium">
-                Failed to load document.
+              <div className="text-destructive mt-10 font-medium p-4 text-center">
+                <p>Failed to load document.</p>
+                {errorMsg && <p className="text-sm mt-2 text-muted-foreground">{errorMsg}</p>}
               </div>
             }
             className="w-full flex flex-col items-center"
