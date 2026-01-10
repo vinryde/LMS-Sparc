@@ -98,24 +98,37 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
 
     fetchPdf();
 
+    let resizeTimeout: NodeJS.Timeout;
+
     function handleResize() {
-      const container = document.getElementById('pdf-container');
-      if (container) {
-        const isDesktop = window.innerWidth >= 1024; // lg breakpoint
-        const fullWidth = container.clientWidth - 40; // 40px for padding
-        setContainerWidth(isDesktop ? fullWidth * 0.9 : fullWidth);
-        setDebugInfo(prev => prev + `\nResize: ${fullWidth}px`);
-        
-        // Calculate scale based on a standard A4 width (approx 600px)
-        // Ensure minimum scale of 0.6 on mobile to prevent text culling
-        const targetScale = fullWidth / 600; 
-        setScale(targetScale < 0.6 && !isDesktop ? 0.6 : targetScale);
-      }
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        const container = document.getElementById('pdf-container');
+        if (container) {
+          const isDesktop = window.innerWidth >= 1024; // lg breakpoint
+          const fullWidth = container.clientWidth - 40; // 40px for padding
+          
+          // Only update if width actually changed significantly (>5px) to prevent loop
+          setContainerWidth(prev => {
+             const newWidth = isDesktop ? fullWidth * 0.9 : fullWidth;
+             if (Math.abs(prev - newWidth) < 5) return prev;
+             
+             // Calculate scale based on a standard A4 width (approx 600px)
+             // Ensure minimum scale of 0.6 on mobile to prevent text culling
+             const targetScale = newWidth / 600; 
+             setScale(targetScale < 0.6 && !isDesktop ? 0.6 : targetScale);
+             return newWidth;
+          });
+        }
+      }, 200); // Debounce resize by 200ms
     }
 
     handleResize();
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimeout);
+    };
   }, [documentUrl]);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
