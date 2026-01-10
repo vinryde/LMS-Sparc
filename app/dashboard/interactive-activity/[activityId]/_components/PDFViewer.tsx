@@ -39,6 +39,12 @@ if (typeof URL.parse === 'undefined') {
 // Use local shim to ensure polyfills are loaded before worker
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf-worker.mjs?v=5.4.296';
 
+const pdfOptions = {
+  cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.296/cmaps/',
+  cMapPacked: true,
+  standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.296/standard_fonts/',
+};
+
 interface PDFViewerProps {
   documentKey: string;
   title: string;
@@ -136,6 +142,7 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
         {isMounted && pdfFile ? (
           <Document
             file={pdfFile}
+            options={pdfOptions}
             onLoadSuccess={onDocumentLoadSuccess}
             onLoadError={onDocumentLoadError}
             loading={
