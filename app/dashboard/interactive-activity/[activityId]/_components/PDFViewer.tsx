@@ -2,7 +2,7 @@
 
 import { useConstructUrl } from "@/hooks/use-construct-url";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, FileText, Loader2 } from "lucide-react";
+import { ArrowLeft, FileText, Loader2, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Document, Page, pdfjs } from 'react-pdf';
@@ -11,7 +11,6 @@ import 'react-pdf/dist/Page/TextLayer.css';
 
 // Polyfill for Promise.withResolvers
 if (typeof Promise.withResolvers === 'undefined') {
- 
   Promise.withResolvers = function <T>() {
     let resolve!: (value: T | PromiseLike<T>) => void;
     let reject!: (reason?: any) => void;
@@ -25,7 +24,6 @@ if (typeof Promise.withResolvers === 'undefined') {
 
 // Polyfill for URL.parse
 if (typeof URL.parse === 'undefined') {
-  
   URL.parse = function (url: string, base?: string) {
     try {
       return new URL(url, base);
@@ -36,14 +34,13 @@ if (typeof URL.parse === 'undefined') {
 }
 
 // Set up the worker for react-pdf
-// Use local shim to ensure polyfills are loaded before worker
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf-worker.mjs?v=5.4.296';
 
 const pdfOptions = {
   cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.296/cmaps/',
   cMapPacked: true,
   standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.296/standard_fonts/',
-  disableRange: true, // Download entire file to avoid range request errors
+  disableRange: true,
 };
 
 interface PDFViewerProps {
@@ -62,14 +59,13 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [pdfFile, setPdfFile] = useState<string | Blob | null>(null);
   const [pixelRatio, setPixelRatio] = useState<number>(1);
+  const [scale, setScale] = useState<number>(1);
 
   useEffect(() => {
     setIsMounted(true);
-    // Cap pixel ratio at 1 for mobile to avoid canvas memory limits, 2 for desktop high-DPI
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2));
     
-    // Fetch the PDF in the main thread to avoid Worker CORS/Fetch issues
     const fetchPdf = async () => {
       try {
         setLoading(true);
@@ -78,7 +74,6 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
           throw new Error(`Failed to fetch PDF: ${response.status} ${response.statusText}`);
         }
         const blob = await response.blob();
-        // Ensure blob is treated as PDF
         const pdfBlob = new Blob([blob], { type: 'application/pdf' });
         setPdfFile(pdfBlob);
       } catch (err) {
@@ -95,8 +90,8 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
     function handleResize() {
       const container = document.getElementById('pdf-container');
       if (container) {
-        const isDesktop = window.innerWidth >= 1024; // lg breakpoint
-        const fullWidth = container.clientWidth - 40; // 40px for padding
+        const isDesktop = window.innerWidth >= 1024;
+        const fullWidth = container.clientWidth - 40;
         setContainerWidth(isDesktop ? fullWidth * 0.9 : fullWidth);
       }
     }
@@ -116,6 +111,20 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
     setErrorMsg(error.message);
     setLoading(false);
   }
+
+  const handleZoomIn = () => {
+    setScale(prevScale => Math.min(prevScale + 0.25, 3));
+  };
+
+  const handleZoomOut = () => {
+    setScale(prevScale => Math.max(prevScale - 0.25, 0.5));
+  };
+
+  const handleResetZoom = () => {
+    setScale(1);
+  };
+
+  const currentWidth = containerWidth * scale;
 
   return (
     <div className="flex flex-col min-h-screen bg-background pl-6 pr-6 pb-6">
@@ -140,10 +149,44 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
         )}
       </div>
 
+      {/* Zoom Controls */}
+      <div className="mb-4 flex items-center gap-2 shrink-0">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleZoomOut}
+          disabled={scale <= 0.5}
+          aria-label="Zoom out"
+        >
+          <ZoomOut className="size-4" />
+        </Button>
+        <span className="text-sm font-medium min-w-[4rem] text-center">
+          {Math.round(scale * 100)}%
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleZoomIn}
+          disabled={scale >= 3}
+          aria-label="Zoom in"
+        >
+          <ZoomIn className="size-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleResetZoom}
+          disabled={scale === 1}
+          aria-label="Reset zoom"
+        >
+          <RotateCcw className="size-4" />
+        </Button>
+      </div>
+
       {/* PDF Viewer Area */}
       <div 
         id="pdf-container"
-        className="flex-1 bg-muted/30 rounded-lg border flex flex-col items-center p-5 relative w-full"
+        className="flex-1 bg-muted/30 rounded-lg border flex flex-col items-center p-5 relative w-full overflow-auto"
         onContextMenu={(e) => e.preventDefault()}
       >
         {isMounted && pdfFile ? (
@@ -167,9 +210,9 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
           >
             {Array.from(new Array(numPages), (el, index) => (
               <Page 
-                key={`page_${index + 1}_${containerWidth}`} 
+                key={`page_${index + 1}_${currentWidth}`} 
                 pageNumber={index + 1} 
-                width={containerWidth}
+                width={currentWidth}
                 devicePixelRatio={pixelRatio}
                 className="mb-4 shadow-lg bg-white"
                 renderTextLayer={false}
