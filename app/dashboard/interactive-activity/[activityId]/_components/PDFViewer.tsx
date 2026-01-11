@@ -40,10 +40,10 @@ if (typeof URL.parse === 'undefined') {
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf-worker.mjs?v=5.4.296';
 
 const pdfOptions = {
-  cMapUrl: 'https://unpkg.com/pdfjs-dist@5.4.296/cmaps/',
+  cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.296/cmaps/',
   cMapPacked: true,
-  standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@5.4.296/standard_fonts/',
-  disableRange: true,
+  standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.296/standard_fonts/',
+  disableRange: true, // Download entire file to avoid range request errors
 };
 
 interface PDFViewerProps {
@@ -62,17 +62,12 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [pdfFile, setPdfFile] = useState<string | Blob | null>(null);
   const [pixelRatio, setPixelRatio] = useState<number>(1);
-  const [debugInfo, setDebugInfo] = useState<string>("");
-  const [isMobile, setIsMobile] = useState(false);
-  const [scale, setScale] = useState<number>(1);
 
   useEffect(() => {
     setIsMounted(true);
-    
-    const checkMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    setIsMobile(checkMobile);
     // Cap pixel ratio at 1 for mobile to avoid canvas memory limits, 2 for desktop high-DPI
-    setPixelRatio(checkMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2));
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2));
     
     // Fetch the PDF in the main thread to avoid Worker CORS/Fetch issues
     const fetchPdf = async () => {
@@ -86,70 +81,40 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
         // Ensure blob is treated as PDF
         const pdfBlob = new Blob([blob], { type: 'application/pdf' });
         setPdfFile(pdfBlob);
-        setDebugInfo(prev => prev + `\nBlob loaded: ${blob.size} bytes`);
       } catch (err) {
         console.error("Main thread PDF fetch error:", err);
-        const msg = err instanceof Error ? err.message : "Failed to load PDF file";
-        setErrorMsg(msg);
-        setDebugInfo(prev => prev + `\nFetch Error: ${msg}`);
+        setErrorMsg(err instanceof Error ? err.message : "Failed to load PDF file");
         setLoading(false);
       }
     };
 
-    fetchPdf();
-
-    let resizeTimeout: NodeJS.Timeout;
+    if (documentUrl) {
+      fetchPdf();
+    }
 
     function handleResize() {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        const container = document.getElementById('pdf-container');
-        if (container) {
-          const isDesktop = window.innerWidth >= 1024; // lg breakpoint
-          const fullWidth = container.clientWidth - 40; // 40px for padding
-          
-          // Only update if width actually changed significantly (>5px) to prevent loop
-          setContainerWidth(prev => {
-             const newWidth = isDesktop ? fullWidth * 0.9 : fullWidth;
-             if (Math.abs(prev - newWidth) < 5) return prev;
-             
-             // Calculate scale based on a standard A4 width (approx 600px)
-             // Ensure minimum scale of 0.6 on mobile to prevent text culling
-             const targetScale = newWidth / 600; 
-             setScale(targetScale < 0.6 && !isDesktop ? 0.6 : targetScale);
-             return newWidth;
-          });
-        }
-      }, 200); // Debounce resize by 200ms
+      const container = document.getElementById('pdf-container');
+      if (container) {
+        const isDesktop = window.innerWidth >= 1024; // lg breakpoint
+        const fullWidth = container.clientWidth - 40; // 40px for padding
+        setContainerWidth(isDesktop ? fullWidth * 0.9 : fullWidth);
+      }
     }
 
     handleResize();
     window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      clearTimeout(resizeTimeout);
-    };
+    return () => window.removeEventListener('resize', handleResize);
   }, [documentUrl]);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
     setLoading(false);
-    setDebugInfo(prev => prev + `\nDoc Loaded: ${numPages} pages`);
   }
 
   function onDocumentLoadError(error: Error) {
     console.error("PDF Load Error:", error);
     setErrorMsg(error.message);
     setLoading(false);
-    setDebugInfo(prev => prev + `\nDoc Load Error: ${error.message}`);
-  }
-
-  function onPageLoadSuccess(page: any) {
-    setDebugInfo(prev => prev + `\nPage ${page.pageNumber} Loaded`);
-  }
-
-  function onPageRenderSuccess(page: any) {
-    setDebugInfo(prev => prev + `\nPage ${page.pageNumber} Rendered`);
   }
 
   return (
@@ -173,45 +138,15 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
         {description && (
           <p className="text-muted-foreground text-lg">{description}</p>
         )}
-        
-        {/* Debug Info Panel - Visible only if there are errors or loading issues */}
-        <details className="text-xs text-muted-foreground bg-muted p-2 rounded mt-2">
-          <summary>Debug Info (Click to expand)</summary>
-          <pre className="whitespace-pre-wrap mt-2">{debugInfo}</pre>
-        </details>
-      
-        {/* Mobile Text Layer Fallback Styles */}
-        <style jsx global>{`
-          .react-pdf__Page__textContent {
-            user-select: text;
-            -webkit-user-select: text;
-            pointer-events: auto;
-          }
-          /* On mobile, force text layer to be visible (black) to compensate for missing canvas text */
-          ${isMobile ? `
-            .react-pdf__Page__textContent span {
-              color: black !important;
-              opacity: 1 !important;
-            }
-          ` : ''}
-        `}</style>
       </div>
 
       {/* PDF Viewer Area */}
       <div 
         id="pdf-container"
-        className="flex-1 bg-muted/30 rounded-lg border flex flex-col items-center p-5 relative w-full overflow-auto"
+        className="flex-1 bg-muted/30 rounded-lg border flex flex-col items-center p-5 relative w-full"
         onContextMenu={(e) => e.preventDefault()}
       >
-        {errorMsg ? (
-          <div className="flex flex-col items-center justify-center gap-2 mt-10 text-destructive p-4 text-center">
-            <p className="font-bold">Failed to load document.</p>
-            <p className="text-sm">{errorMsg}</p>
-            <Button variant="outline" onClick={() => window.location.reload()} className="mt-4">
-              Retry
-            </Button>
-          </div>
-        ) : isMounted && pdfFile ? (
+        {isMounted && pdfFile ? (
           <Document
             file={pdfFile}
             options={pdfOptions}
@@ -232,27 +167,14 @@ export function PDFViewer({ documentKey, title, description, backLink }: PDFView
           >
             {Array.from(new Array(numPages), (el, index) => (
               <Page 
-                key={`page_${index + 1}_${scale}_${pixelRatio}`} 
+                key={`page_${index + 1}_${containerWidth}`} 
                 pageNumber={index + 1} 
-                scale={scale}
+                width={containerWidth}
                 devicePixelRatio={pixelRatio}
-                className="mb-4 shadow-lg" // Removed bg-white to prevent covering
-                 // Ensure canvas doesn't paint a white block
-                renderTextLayer={true} 
-                renderAnnotationLayer={!isMobile}
-                onLoadSuccess={onPageLoadSuccess}
-                onRenderSuccess={onPageRenderSuccess}
-                onGetTextSuccess={(text) => {
-                  setDebugInfo(prev => prev + `\nPage ${index + 1} Text Items: ${text.items.length}`);
-                }}
-                onGetTextError={(err) => {
-                  console.error(`Page ${index + 1} text error:`, err);
-                  setDebugInfo(prev => prev + `\nPage ${index + 1} Text Error: ${err.message}`);
-                }}
-                onRenderError={(err) => {
-                  console.error(`Page ${index + 1} render error:`, err);
-                  setDebugInfo(prev => prev + `\nPage ${index + 1} Render Error: ${err.message}`);
-                }}
+                className="mb-4 shadow-lg bg-white"
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
+                onRenderError={(err) => console.error(`Page ${index + 1} render error:`, err)}
               />
             ))}
           </Document>
