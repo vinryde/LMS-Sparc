@@ -97,7 +97,7 @@ function onSubmit() {
 const document=useConstructUrl(data.documentKey? data.documentKey:"")
 
 return(
-    <div className="flex flex-col h-full bg-background pl-6 ">
+    <div className="flex flex-col h-full bg-background px-2 md:pl-8 ">
       <VideoPlayer thumbnailKey={data.thumbnailKey ?? ""} documentKey={data.documentKey ?? ""} videoKey={data.videoKey ?? ""} /> 
         <div className="py-4 border-b">
             {data.lessonProgress.length>0?(<Button variant="outline" className="bg-green-500/10 text-green-500">
