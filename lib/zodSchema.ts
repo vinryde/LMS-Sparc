@@ -207,9 +207,29 @@ export const reorderInteractiveActivitiesSchema = z.object({
     position: z.number(),
   })),
 });
+export const interactiveActivityResourceSchema = z.object({
+  title: z.string().min(3, {message: "Title must be at least 3 characters long"}),
+  type: z.enum(resourceTypes, {message: "Resource type is required"}),
+  interactiveActivityId: z.string().uuid({message: "Invalid interactive activity id"}),
+  textContent: z.string().optional(),
+  linkUrl: z.string().url({message: "Invalid URL"}).optional(),
+  imageKey: z.string().optional(),
+  documentKey: z.string().optional(),
+});
+
+export const reorderInteractiveActivityResourcesSchema = z.object({
+  interactiveActivityId: z.string().uuid(),
+  resources: z.array(z.object({
+    id: z.string().uuid(),
+    position: z.number(),
+  })),
+});
+
 
 export type InteractiveActivitySchemaType = z.infer<typeof interactiveActivitySchema>;
 export type ReorderInteractiveActivitiesSchemaType = z.infer<typeof reorderInteractiveActivitiesSchema>;
+export type InteractiveActivityResourceSchemaType = z.infer<typeof interactiveActivityResourceSchema>;
+export type ReorderInteractiveActivityResourcesSchemaType = z.infer<typeof reorderInteractiveActivityResourcesSchema>;
 
 export type ResourceSchemaType = z.infer<typeof resourceSchema>;
 export type ReorderResourcesSchemaType = z.infer<typeof reorderResourcesSchema>;

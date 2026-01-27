@@ -1,5 +1,6 @@
 import { getInteractiveActivity } from "@/app/data/course/get-interactive-activity";
 import { PDFViewer } from "./_components/PDFViewer";
+import { InteractiveActivityResources } from "./_components/InteractiveActivityResources";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,12 +33,17 @@ async function RenderInteractiveActivity({ activityId }: { activityId: string })
   const backLink = `/dashboard/${slug}/${lessonId}`;
 
   return (
-    <PDFViewer
-      documentKey={activity.documentKey}
-      title={activity.title}
-      description={activity.description}
-      backLink={backLink}
-    />
+    <div className="flex flex-col">
+      <PDFViewer
+        documentKey={activity.documentKey}
+        title={activity.title}
+        description={activity.description}
+        backLink={backLink}
+      />
+      <div className="px-6 pb-10">
+        <InteractiveActivityResources resources={activity.resources} />
+      </div>
+    </div>
   );
 }
 

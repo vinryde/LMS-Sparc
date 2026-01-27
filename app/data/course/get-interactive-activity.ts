@@ -15,6 +15,20 @@ export async function getInteractiveActivity(activityId: string) {
       title: true,
       description: true,
       documentKey: true,
+      resources: {
+        orderBy: {
+          position: "asc",
+        },
+        select: {
+          id: true,
+          title: true,
+          type: true,
+          textContent: true,
+          linkUrl: true,
+          imageKey: true,
+          documentKey: true,
+        },
+      },
       lesson: {
         select: {
           id: true,

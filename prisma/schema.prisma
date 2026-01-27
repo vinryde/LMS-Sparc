@@ -179,6 +179,26 @@ model InteractiveActivity {
   
   lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   lessonId    String
+  resources   InteractiveActivityResource[] 
+}
+
+model InteractiveActivityResource {
+  id          String       @id @default(uuid())
+  title       String
+  type        ResourceType
+  position    Int
+  
+  // Fields for different resource types
+  textContent String?      // For TEXT type
+  linkUrl     String?      // For LINK type
+  imageKey    String?      // For IMAGE type
+  documentKey String?      // For DOCUMENT type
+  
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  interactiveActivity InteractiveActivity @relation(fields: [interactiveActivityId], references: [id], onDelete: Cascade)
+  interactiveActivityId String
 }
 
 model Enrollment{

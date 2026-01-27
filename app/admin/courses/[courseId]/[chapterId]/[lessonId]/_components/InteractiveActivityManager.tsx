@@ -33,6 +33,7 @@ import {
   getInteractiveActivitiesData,
 } from "../actions";
 import { Uploader } from "@/components/file-uploader/Uploader";
+import { InteractiveActivityResources } from "./Interactiveactivityresources";
 
 type InteractiveActivityData = {
   id: string;
@@ -40,6 +41,16 @@ type InteractiveActivityData = {
   description: string | null;
   documentKey: string;
   position: number;
+  resources?: Array<{
+    id: string;
+    title: string;
+    type: "TEXT" | "LINK" | "IMAGE" | "DOCUMENT";
+    position: number;
+    textContent: string | null;
+    linkUrl: string | null;
+    imageKey: string | null;
+    documentKey: string | null;
+  }>;
 } | null;
 
 interface InteractiveActivityManagerProps {
@@ -114,6 +125,17 @@ export function InteractiveActivityManager({ lessonId, initialActivities, onActi
     setEditingActivityId(null);
   }
 
+  // New function to refresh activities data including resources
+  async function refreshActivities() {
+    const { data: activityData } = await tryCatch(getInteractiveActivitiesData(lessonId));
+    if (activityData) {
+      setActivities(activityData || []);
+      if (onActivityUpdate) {
+        onActivityUpdate(activityData);
+      }
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="space-y-4">
@@ -140,6 +162,7 @@ export function InteractiveActivityManager({ lessonId, initialActivities, onActi
             lessonId={lessonId}
             onSave={handleActivitySaved}
             onCancel={() => setEditingActivityId(null)}
+            onRefresh={refreshActivities}
           />
         )}
 
@@ -171,6 +194,7 @@ export function InteractiveActivityManager({ lessonId, initialActivities, onActi
                     isEditing={editingActivityId === activity.id}
                     onSaveEdit={handleActivitySaved}
                     onCancelEdit={() => setEditingActivityId(null)}
+                    onRefresh={refreshActivities}
                     lessonId={lessonId}
                   />
                 ))}
@@ -190,6 +214,7 @@ function SortableInteractiveActivity({
   isEditing,
   onSaveEdit,
   onCancelEdit,
+  onRefresh,
   lessonId,
 }: {
   activity: any;
@@ -198,6 +223,7 @@ function SortableInteractiveActivity({
   isEditing: boolean;
   onSaveEdit: () => void;
   onCancelEdit: () => void;
+  onRefresh: () => void;
   lessonId: string;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -217,6 +243,7 @@ function SortableInteractiveActivity({
           activity={activity}
           onSave={onSaveEdit}
           onCancel={onCancelEdit}
+          onRefresh={onRefresh}
         />
       </div>
     );
@@ -247,6 +274,11 @@ function SortableInteractiveActivity({
         {activity.description && (
           <p className="text-sm text-muted-foreground line-clamp-2">{activity.description}</p>
         )}
+        {activity.resources && activity.resources.length > 0 && (
+          <p className="text-xs text-muted-foreground mt-2">
+            {activity.resources.length} resource{activity.resources.length !== 1 ? "s" : ""}
+          </p>
+        )}
       </div>
       <div className="flex gap-1 shrink-0">
         <Button variant="ghost" size="sm" onClick={onEdit}>
@@ -265,11 +297,13 @@ function InteractiveActivityEditor({
   activity,
   onSave,
   onCancel,
+  onRefresh,
 }: {
   lessonId: string;
   activity?: any;
   onSave: () => void;
   onCancel: () => void;
+  onRefresh: () => void;
 }) {
   const [title, setTitle] = useState(activity?.title || "");
   const [description, setDescription] = useState(activity?.description || "");
@@ -309,6 +343,12 @@ function InteractiveActivityEditor({
     }
   }
 
+  // Handler for when resources are updated
+  async function handleResourceUpdate() {
+    // Refresh the entire activities list to get updated resource counts
+    await onRefresh();
+  }
+
   return (
     <div className="space-y-4 p-4 border-2 border-dashed rounded-lg bg-muted/30">
       <div className="flex items-center justify-between">
@@ -341,7 +381,7 @@ function InteractiveActivityEditor({
       </div>
 
       <div className="space-y-2">
-        <Label>Document *</Label>
+        <Label>Activity Document *</Label>
         <Uploader
           value={documentKey}
           onChange={setDocumentKey}
@@ -373,6 +413,15 @@ function InteractiveActivityEditor({
           )}
         </Button>
       </div>
+
+      {/* Resources Section - Only show for existing activities */}
+      {activity && (
+        <InteractiveActivityResources
+          activityId={activity.id}
+          initialResources={activity.resources || []}
+          onResourceUpdate={handleResourceUpdate}
+        />
+      )}
     </div>
   );
 }

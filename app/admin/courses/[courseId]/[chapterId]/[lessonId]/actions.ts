@@ -9,7 +9,7 @@ import { lessonSchema, LessonSchemaType, quizSchema,
   QuizSchemaType,
   QuestionSchemaType,
   ReorderQuestionsSchemaType, feedbackSchema,activitySchema,reorderActivitiesSchema,activityResourceSchema,reorderActivityResourcesSchema, type FeedbackSchemaType,resourceSchema, reorderResourcesSchema, type ResourceSchemaType, type ReorderResourcesSchemaType, type ActivitySchemaType, type ReorderActivitiesSchemaType, type ActivityResourceSchemaType, type ReorderActivityResourcesSchemaType,
-  interactiveActivitySchema, reorderInteractiveActivitiesSchema, type InteractiveActivitySchemaType, type ReorderInteractiveActivitiesSchemaType } from "@/lib/zodSchema";
+  interactiveActivitySchema, reorderInteractiveActivitiesSchema, type InteractiveActivitySchemaType, type ReorderInteractiveActivitiesSchemaType, interactiveActivityResourceSchema, reorderInteractiveActivityResourcesSchema, type InteractiveActivityResourceSchemaType, type ReorderInteractiveActivityResourcesSchemaType } from "@/lib/zodSchema";
 
 import { revalidatePath } from "next/cache";
 
@@ -845,6 +845,21 @@ export async function getInteractiveActivitiesData(lessonId: string) {
         description: true,
         documentKey: true,
         position: true,
+        resources: {
+          orderBy: {
+            position: 'asc',
+          },
+          select: {
+            id: true,
+            title: true,
+            type: true,
+            position: true,
+            textContent: true,
+            linkUrl: true,
+            imageKey: true,
+            documentKey: true,
+          },
+        },
       },
     });
 
@@ -1584,6 +1599,299 @@ export async function getActivityResourcesData(activityId: string) {
     return null;
   }
 }
+//interactive activity resources
+export async function getInteractiveActivityResourcesData(interactiveActivityId: string) {
+  await requireAdmin();
+
+  try {
+    const resources = await prisma.interactiveActivityResource.findMany({
+      where: {
+        interactiveActivityId: interactiveActivityId,
+      },
+      orderBy: {
+        position: 'asc',
+      },
+      select: {
+        id: true,
+        title: true,
+        type: true,
+        position: true,
+        textContent: true,
+        linkUrl: true,
+        imageKey: true,
+        documentKey: true,
+      },
+    });
+
+    return resources;
+  } catch (error) {
+    console.error("Failed to fetch interactive activity resources:", error);
+    return null;
+  }
+}
+
+export async function createInteractiveActivityResource(
+  values: InteractiveActivityResourceSchemaType
+): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const result = interactiveActivityResourceSchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid data",
+      };
+    }
+
+    // Validate required fields for resource type
+    if (result.data.type === "TEXT" && !result.data.textContent) {
+      return {
+        status: "error",
+        message: "Text content is required for TEXT resources",
+      };
+    }
+    if (result.data.type === "LINK" && !result.data.linkUrl) {
+      return {
+        status: "error",
+        message: "Link URL is required for LINK resources",
+      };
+    }
+    if (result.data.type === "IMAGE" && !result.data.imageKey) {
+      return {
+        status: "error",
+        message: "Image is required for IMAGE resources",
+      };
+    }
+    if (result.data.type === "DOCUMENT" && !result.data.documentKey) {
+      return {
+        status: "error",
+        message: "Document is required for DOCUMENT resources",
+      };
+    }
+
+    // Get max position
+    const maxPos = await prisma.interactiveActivityResource.findFirst({
+      where: {
+        interactiveActivityId: result.data.interactiveActivityId,
+      },
+      select: {
+        position: true,
+      },
+      orderBy: {
+        position: 'desc',
+      },
+    });
+
+    // Create resource
+    await prisma.interactiveActivityResource.create({
+      data: {
+        title: result.data.title,
+        type: result.data.type,
+        interactiveActivityId: result.data.interactiveActivityId,
+        position: (maxPos?.position ?? 0) + 1,
+        textContent: result.data.textContent,
+        linkUrl: result.data.linkUrl,
+        imageKey: result.data.imageKey,
+        documentKey: result.data.documentKey,
+      },
+    });
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: "success",
+      message: "Resource created successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to create resource",
+    };
+  }
+}
+
+export async function updateInteractiveActivityResource(
+  values: InteractiveActivityResourceSchemaType,
+  resourceId: string
+): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const result = interactiveActivityResourceSchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid data",
+      };
+    }
+
+    // Validate required fields
+    if (result.data.type === "TEXT" && !result.data.textContent) {
+      return {
+        status: "error",
+        message: "Text content is required for TEXT resources",
+      };
+    }
+    if (result.data.type === "LINK" && !result.data.linkUrl) {
+      return {
+        status: "error",
+        message: "Link URL is required for LINK resources",
+      };
+    }
+    if (result.data.type === "IMAGE" && !result.data.imageKey) {
+      return {
+        status: "error",
+        message: "Image is required for IMAGE resources",
+      };
+    }
+    if (result.data.type === "DOCUMENT" && !result.data.documentKey) {
+      return {
+        status: "error",
+        message: "Document is required for DOCUMENT resources",
+      };
+    }
+
+    await prisma.interactiveActivityResource.update({
+      where: {
+        id: resourceId,
+      },
+      data: {
+        title: result.data.title,
+        type: result.data.type,
+        textContent: result.data.textContent,
+        linkUrl: result.data.linkUrl,
+        imageKey: result.data.imageKey,
+        documentKey: result.data.documentKey,
+      },
+    });
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: "success",
+      message: "Resource updated successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to update resource",
+    };
+  }
+}
+
+export async function deleteInteractiveActivityResource({
+  resourceId,
+  interactiveActivityId,
+}: {
+  resourceId: string;
+  interactiveActivityId: string;
+}): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const activityWithResources = await prisma.interactiveActivity.findUnique({
+      where: {
+        id: interactiveActivityId,
+      },
+      select: {
+        resources: {
+          orderBy: {
+            position: 'asc',
+          },
+          select: {
+            id: true,
+            position: true,
+          },
+        },
+      },
+    });
+
+    if (!activityWithResources) {
+      return {
+        status: 'error',
+        message: 'Interactive activity not found.',
+      };
+    }
+
+    const resources = activityWithResources.resources;
+    const resourceToDelete = resources.find((r) => r.id === resourceId);
+
+    if (!resourceToDelete) {
+      return {
+        status: 'error',
+        message: 'Resource not found.',
+      };
+    }
+
+    const remainingResources = resources.filter((r) => r.id !== resourceId);
+    const updates = remainingResources.map((resource, index) =>
+      prisma.interactiveActivityResource.update({
+        where: { id: resource.id },
+        data: { position: index + 1 },
+      })
+    );
+
+    await prisma.$transaction([
+      ...updates,
+      prisma.interactiveActivityResource.delete({
+        where: { id: resourceId },
+      }),
+    ]);
+
+    revalidatePath(`/admin/courses`);
+    return {
+      status: 'success',
+      message: 'Resource deleted successfully.',
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to delete resource.",
+    };
+  }
+}
+
+export async function reorderInteractiveActivityResources(
+  values: ReorderInteractiveActivityResourcesSchemaType
+): Promise<ApiResponse> {
+  await requireAdmin();
+
+  try {
+    const result = reorderInteractiveActivityResourcesSchema.safeParse(values);
+    if (!result.success) {
+      return {
+        status: "error",
+        message: "Invalid data",
+      };
+    }
+
+    const updates = result.data.resources.map((resource) =>
+      prisma.interactiveActivityResource.update({
+        where: {
+          id: resource.id,
+        },
+        data: {
+          position: resource.position,
+        },
+      })
+    );
+
+    await prisma.$transaction(updates);
+    revalidatePath(`/admin/courses`);
+
+    return {
+      status: "success",
+      message: "Resources reordered successfully",
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Failed to reorder resources",
+    };
+  }
+}
+
+
+
 
 
 
