@@ -207,7 +207,7 @@ export function Testimonial() {
             </div>
 
             {/* Author row */}
-            <div className="flex items-end justify-between">
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeIndex}
@@ -233,7 +233,7 @@ export function Testimonial() {
               </AnimatePresence>
 
               {/* Navigation */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 md:justify-end">
                 <motion.button
                   onClick={goPrev}
                   className="group relative w-12 h-12 rounded-full border border-border flex items-center justify-center overflow-hidden"
