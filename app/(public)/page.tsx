@@ -9,12 +9,9 @@ import { Web3HeroSection } from "@/components/web3-hero-section";
 import { PointerHighlight } from "@/components/pointer-highlight";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { HomeFeatures } from "@/components/homefeatures";
-import FeaturesSectionMinimal from "@/components/bento-monochrome";
-import FeaturesSectionMinimalClimate from "@/components/bento-climate";
-import ScrollingHeroMarquee from "@/components/scrolling-hero-marquee";
-import { MagicText } from "@/components/ui/magic-text";
 import EarbudShowcase from "@/components/spatial-product-showcase";
-import { Testimonial } from "@/components/design-testimonial"
+import { Testimonial } from "@/components/design-testimonial";
+import TestimonialSliderDemo from "@/components/DemoFile";
 interface featureProps {
   title: string;
   description: string;
@@ -67,13 +64,16 @@ export default function Home() {
             
           </div>
           </div>
+          <TestimonialSliderDemo />
           <HomeFeatures />
-          <div className="overflow-hidden">
-            <EarbudShowcase/>
-          </div>
           <div className="overflow-x-hidden">
           <Testimonial />
           </div>
+          <div className="overflow-hidden">
+            <EarbudShowcase/>
+          </div>
+          
+          
           
       
     </div>

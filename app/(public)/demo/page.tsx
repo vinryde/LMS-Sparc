@@ -6,6 +6,7 @@ import { Testimonial } from "@/components/design-testimonial"
 import FeaturesSectionMinimal from "@/components/bento-monochrome";
 import FeaturesSectionMinimalClimate from "@/components/bento-climate";
 import { MagicText } from "@/components/ui/magic-text";
+import TestimonialSliderDemo from "@/components/DemoFile";
 
 export default function Demo(){
   const words= "CREATE transforms education into a tool for climate action and energy awareness. Through research-driven learning, teacher training, and international collaboration, we equip participants with the skills to integrate climate and energy concepts into classrooms, research projects, and community initiatives. Our vision is to create a world where sustainability education inspires innovation, responsibility, and collective action for ecological well-being."
@@ -42,6 +43,7 @@ export default function Demo(){
           
       </div>
           <FeaturesSectionMinimalClimate/>
+          <TestimonialSliderDemo/>
 
       
     </div>
