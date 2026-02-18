@@ -206,7 +206,7 @@ export function Testimonial() {
               </AnimatePresence>
             </div>
 
-            {/* Author row */}
+            {/* Author rosw */}
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <AnimatePresence mode="wait">
                 <motion.div
