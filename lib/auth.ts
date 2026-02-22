@@ -32,7 +32,7 @@ export const auth = betterAuth({
     emailOTP({
         async sendVerificationOTP(email){
            await resend.emails.send({
-            from: 'SPARC LMS <onboarding@resend.dev>',
+            from: 'SPARC LMS <verification@createsparc.com>',
             to: [email.email],
             subject: 'SPARC LMS Verification Code',
             html: `<p>Your verification code is: <strong>${email.otp}</strong></p>`,
