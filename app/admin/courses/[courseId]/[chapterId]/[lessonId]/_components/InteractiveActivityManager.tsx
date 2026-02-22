@@ -143,7 +143,7 @@ export function InteractiveActivityManager({ lessonId, initialActivities, onActi
           <div>
             <h4 className="text-sm font-semibold">Interactive Activities</h4>
             <p className="text-xs text-muted-foreground">
-              {activities.length} activity{activities.length !== 1 ? "ies" : ""} added
+               {activities.length} activit{activities.length !== 1 ? "ies" : "y"} added
             </p>
           </div>
           <Button

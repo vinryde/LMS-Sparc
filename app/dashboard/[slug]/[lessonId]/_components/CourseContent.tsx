@@ -143,7 +143,7 @@ return(
                     <MousePointerClick className="size-5 text-indigo-600" />
                   </div>
                   <div>
-                    <CardTitle className="text-xl">Interactive Activities</CardTitle>
+                    <CardTitle className="text-xl">Activities</CardTitle>
                     <p className="text-sm text-muted-foreground mt-1">
                       Engage with course materials
                     </p>
@@ -179,7 +179,7 @@ return(
             </Card>
           </div>
         )}
-        {data.activities && data.activities.length > 0 && (
+       {/* {data.activities && data.activities.length > 0 && (
                  <div className="mt-8">
                    <Card className="border-2">
               
@@ -224,7 +224,7 @@ return(
                      </CardContent>
                    </Card>
                  </div>
-               )}
+               )}*/}
 
          {/* Resources Section */}
          {data.resources && data.resources.length > 0 && (

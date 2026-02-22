@@ -181,7 +181,7 @@ export function LessonForm({ chapterId, data, courseId }: iAppProps) {
       {/* ================= INTERACTIVE ACTIVITIES SECTION ================= */}
       <Card>
         <CardHeader>
-          <CardTitle>Interactive Activities (Optional)</CardTitle>
+          <CardTitle>Activities</CardTitle>
           <CardDescription>Add documents for interactive activities</CardDescription>
         </CardHeader>
         <CardContent>
@@ -202,7 +202,7 @@ export function LessonForm({ chapterId, data, courseId }: iAppProps) {
       <Separator className="my-6" />
 
       {/* ================= NEW ACTIVITIES SECTION ================= */}
-      <Card>
+    {/*   <Card>
         <CardHeader>
           <CardTitle>Activities (Optional)</CardTitle>
           <CardDescription>Add engaging activities for students to reinforce their learning</CardDescription>
@@ -222,7 +222,7 @@ export function LessonForm({ chapterId, data, courseId }: iAppProps) {
         </CardContent>
       </Card>
 
-      <Separator className="my-6" />
+      <Separator className="my-6" />*/}
 
       {/* ================= QUIZ SECTION ================= */}
       <Card>
