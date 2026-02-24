@@ -7,11 +7,13 @@ import FeaturesSectionMinimal from "@/components/bento-monochrome";
 import FeaturesSectionMinimalClimate from "@/components/bento-climate";
 import { MagicText } from "@/components/ui/magic-text";
 import TestimonialSliderDemo from "@/components/DemoFile";
+import HeroSectionNew from "@/components/glassmorphism-trust-hero";
 
 export default function Demo(){
   const words= "CREATE transforms education into a tool for climate action and energy awareness. Through research-driven learning, teacher training, and international collaboration, we equip participants with the skills to integrate climate and energy concepts into classrooms, research projects, and community initiatives. Our vision is to create a world where sustainability education inspires innovation, responsibility, and collective action for ecological well-being."
     return (
          <div className="px-0 space-y-8">
+          <HeroSectionNew/>
             <Web3HeroSection />
             <div className="grid grid-cols-1 md:grid-cols-2 mt-16 gap-9">
             <div className="px-4 mt-16 sm:max-w-4xl md:max-w-none space-y-6">

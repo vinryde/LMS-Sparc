@@ -12,6 +12,7 @@ import { HomeFeatures } from "@/components/homefeatures";
 import EarbudShowcase from "@/components/spatial-product-showcase";
 import { Testimonial } from "@/components/design-testimonial";
 import TestimonialSliderDemo from "@/components/DemoFile";
+import HeroSectionNew from "@/components/glassmorphism-trust-hero";
 interface featureProps {
   title: string;
   description: string;
@@ -49,7 +50,7 @@ export default function Home() {
   return (
     <>
     <div className="px-0 space-y-8">
-            <Web3HeroSection />
+          <HeroSectionNew />
             <div className="grid grid-cols-1 md:grid-cols-2 mt-16 gap-9 md:mx-10 mx-0">
             <div className="px-4 mt-16 sm:max-w-4xl md:max-w-none space-y-6">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tighter ">How does <span><PointerHighlight>CREATE</PointerHighlight> </span> make a difference?</h1>
@@ -69,9 +70,7 @@ export default function Home() {
           <div className="overflow-x-hidden">
           <Testimonial />
           </div>
-          <div className="overflow-hidden">
-            <EarbudShowcase/>
-          </div>
+          
           
           
           
