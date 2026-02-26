@@ -56,10 +56,10 @@ export default function HeroSectionNew() {
 
       {/* Background Image with Gradient Mask */}
       <div 
-        className="absolute inset-0 z-0 bg-[url(/imagehero.jpg)] bg-cover bg-center opacity-40"
+        className="absolute inset-0 z-0 bg-[url(/imagehero.jpg)] bg-cover bg-center opacity-70"
         style={{
-          maskImage: "linear-gradient(180deg, transparent, black 0%, black 70%, transparent)",
-          WebkitMaskImage: "linear-gradient(180deg, transparent, black 0%, black 70%, transparent)",
+          maskImage: "linear-gradient(180deg, transparent, black 0%, black 80%, transparent)",
+          WebkitMaskImage: "linear-gradient(180deg, transparent, black 0%, black 80%, transparent)",
         }}
       />
 
@@ -72,23 +72,23 @@ export default function HeroSectionNew() {
             {/* Badge */}
             <div className="animate-fade-in delay-100">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 backdrop-blur-md transition-colors hover:bg-white/10">
-                <span className="text-[8px] sm:text-xs capitalize tracking-wider text-zinc-300 flex items-center gap-2">
-                  Climate Science Research, Energy Education and Training for Ecological Sustainability
+                <span className="text-[11px] sm:text-xs capitalize tracking-wider text-zinc-300 flex items-center gap-2">
+                  Education For Sustainable Futures
                 </span>
               </div>
             </div>
 
             {/* Heading */}
             <h1 
-              className="animate-fade-in delay-200 text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-medium tracking-tighter leading-[0.9]"
+              className="animate-fade-in delay-200 text-4xl sm:text-4xl lg:text-6xl xl:text-6xl font-medium tracking-tighter leading-[1.1]"
               style={{
                 maskImage: "linear-gradient(180deg, black 0%, black 80%, transparent 100%)",
                 WebkitMaskImage: "linear-gradient(180deg, black 0%, black 80%, transparent 100%)"
               }}
             >
-              Education For<br />
+              Climate Science Research,<br />
               
-              Sustainable Futures
+               Energy Education and Training for Ecological Sustainability
             </h1>
 
             {/* Description */}

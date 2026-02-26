@@ -10,7 +10,7 @@ import TestimonialSliderDemo from "@/components/DemoFile";
 import HeroSectionNew from "@/components/glassmorphism-trust-hero";
 
 export default function Demo(){
-  const words= "CREATE transforms education into a tool for climate action and energy awareness. Through research-driven learning, teacher training, and international collaboration, we equip participants with the skills to integrate climate and energy concepts into classrooms, research projects, and community initiatives. Our vision is to create a world where sustainability education inspires innovation, responsibility, and collective action for ecological well-being."
+  const words= "CREATE (Climate Science Research, Energy Education and Training for Ecological Sustainability) is an innovative online learning platform designed as a comprehensive resource hub for educators teaching energy and climate change. Built as an integrated ecosystem of climate science, energy education, and ecological sustainability, CREATE uniquely structures its content around Energy Literacy and Climate Change Literacy principles. Its modules are aligned with internationally recognized literacy frameworks, ensuring scientific accuracy, conceptual clarity, critical thinking, and action-oriented learning. The platform offers classroom-ready activities, structured lesson plans, and curated teaching resources, integrating environmental data, renewable energy transitions, policy awareness, and community engagement to support meaningful, real-world education and foster climate-informed, responsible citizens."
     return (
          <div className="px-0 space-y-8">
           <HeroSectionNew/>
@@ -25,8 +25,10 @@ export default function Demo(){
              </p>
           </div>
           <div className="px-4">
-            <img src="/imageone.jpg" alt="CREATE" className="w-full h-auto rounded-lg shadow-lg" />
-            
+            <div 
+              className="w-full h-full min-h-[550px] rounded-lg bg-[url(/create_logo.png)] bg-cover bg-center"
+              aria-label="CREATE"
+            />
           </div>
           </div>
           <div>

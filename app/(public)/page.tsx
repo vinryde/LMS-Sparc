@@ -43,7 +43,7 @@ const features: featureProps[] =[
 ]
 
 export default function Home() {
-  const words= "CREATE transforms education into a tool for climate action and energy awareness. Through research-driven learning, teacher training, and international collaboration, we equip participants with the skills to integrate climate and energy concepts into classrooms, research projects, and community initiatives. Our vision is to create a world where sustainability education inspires innovation, responsibility, and collective action for ecological well-being."
+  const words= "CREATE (Climate Science Research, Energy Education and Training for Ecological Sustainability) is an innovative online learning platform serving as a comprehensive resource hub for educators teaching energy and climate change. Designed as an integrated ecosystem of climate science, energy education, and ecological sustainability, CREATE uniquely structures its content around Energy Literacy and Climate Change Literacy principles. Its modules align with internationally recognized literacy frameworks, ensuring scientific accuracy, conceptual clarity, critical thinking, and action-oriented learning. The platform provides classroom-ready activities, structured lesson plans, and curated resources, integrating environmental data, renewable energy transitions, policy awareness, and community engagement to support meaningful education and climate-informed citizenship."
     
   
 
@@ -54,14 +54,17 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 mt-16 gap-9 md:mx-10 mx-0">
             <div className="px-4 mt-16 sm:max-w-4xl md:max-w-none space-y-6">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tighter ">How does <span><PointerHighlight>CREATE</PointerHighlight> </span> make a difference?</h1>
-          <p className="text-lg md:text-xl text-neutral-600 dark:text-neutral-400">
+          <p className="text-lg md:text-lg text-neutral-600 dark:text-neutral-400">
            
             <TextGenerateEffect duration={2} filter={false} words={words} className="text-muted-foreground font-normal text-sm" />
 
              </p>
           </div>
           <div className="px-4">
-            <img src="/imageone.jpg" alt="CREATE" className="w-full h-auto rounded-lg shadow-lg" />
+             <div 
+              className="w-full h-full min-h-[700px] rounded-lg bg-[url(/create_logo.png)] bg-cover bg-center"
+              aria-label="CREATE"
+            />
             
           </div>
           </div>
