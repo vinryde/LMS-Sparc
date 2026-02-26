@@ -73,7 +73,7 @@ export default function Home() {
           <div className="w-full overflow-x-hidden">
             <LogoOne/>
           </div>
-          <div>
+          <div className="mt-32">
           <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-balance md:text-4xl lg:text-5xl xl:font-bold">
             Discover our climate and energy courses
