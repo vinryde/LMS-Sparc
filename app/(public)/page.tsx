@@ -62,7 +62,7 @@ export default function Home() {
           </div>
           <div className="px-4">
              <div 
-              className="w-full h-full min-h-[700px] rounded-lg bg-[url(/create_logo.png)] bg-cover bg-center"
+              className="w-full h-full min-h-[500px] md:min-h-[700px] rounded-lg bg-[url(/create_logo.png)] bg-cover bg-center"
               aria-label="CREATE"
             />
             
