@@ -13,6 +13,7 @@ import EarbudShowcase from "@/components/spatial-product-showcase";
 import { Testimonial } from "@/components/design-testimonial";
 import TestimonialSliderDemo from "@/components/DemoFile";
 import HeroSectionNew from "@/components/glassmorphism-trust-hero";
+import LogoOne from "@/components/logo-slider";
 interface featureProps {
   title: string;
   description: string;
@@ -67,6 +68,9 @@ export default function Home() {
             />
             
           </div>
+          </div>
+          <div className="w-full overflow-x-hidden">
+            <LogoOne/>
           </div>
           <TestimonialSliderDemo />
           <HomeFeatures />
