@@ -14,6 +14,7 @@ import { Testimonial } from "@/components/design-testimonial";
 import TestimonialSliderDemo from "@/components/DemoFile";
 import HeroSectionNew from "@/components/glassmorphism-trust-hero";
 import LogoOne from "@/components/logo-slider";
+import AboutUsSection from "@/components/about-us-section";
 interface featureProps {
   title: string;
   description: string;
@@ -71,6 +72,17 @@ export default function Home() {
           </div>
           <div className="w-full overflow-x-hidden">
             <LogoOne/>
+          </div>
+          <div>
+          <div className="max-w-5xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-balance md:text-4xl lg:text-5xl xl:font-bold">
+            Discover our climate and energy courses
+          </h2>
+          <p className="text-muted-foreground mt-4 text-sm text-center mx-auto md:text-base max-w-3xl">
+            Explore structured learning paths in energy literacy and climate science designed to help learners build practical, future-ready skills.
+          </p>
+        </div>
+          <AboutUsSection />
           </div>
           <TestimonialSliderDemo />
           <HomeFeatures />
