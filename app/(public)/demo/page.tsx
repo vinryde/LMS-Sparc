@@ -10,6 +10,7 @@ import TestimonialSliderDemo from "@/components/DemoFile";
 import HeroSectionNew from "@/components/glassmorphism-trust-hero";
 import LogoOne from "@/components/logo-slider";
 import AboutUsSection from "@/components/about-us-section";
+import AboutClimate from "@/components/climate-about";
 
 export default function Demo(){
   const words= "CREATE (Climate Science Research, Energy Education and Training for Ecological Sustainability) is an innovative online learning platform designed as a comprehensive resource hub for educators teaching energy and climate change. Built as an integrated ecosystem of climate science, energy education, and ecological sustainability, CREATE uniquely structures its content around Energy Literacy and Climate Change Literacy principles. Its modules are aligned with internationally recognized literacy frameworks, ensuring scientific accuracy, conceptual clarity, critical thinking, and action-oriented learning. The platform offers classroom-ready activities, structured lesson plans, and curated teaching resources, integrating environmental data, renewable energy transitions, policy awareness, and community engagement to support meaningful, real-world education and foster climate-informed, responsible citizens."
@@ -38,6 +39,7 @@ export default function Demo(){
           </div>
           <div>
             <AboutUsSection />
+            <AboutClimate/>
           </div>
           <div>
           <EarbudShowcase/>

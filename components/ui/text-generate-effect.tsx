@@ -30,7 +30,7 @@ export const TextGenerateEffect = ({
         },
         {
           duration: duration ? duration : 1,
-          delay: stagger(0.2),
+          delay: stagger(0.08),
         }
       );
       setHasAnimated(true);
@@ -44,7 +44,7 @@ export const TextGenerateEffect = ({
           return (
             <motion.span
               key={word + idx}
-              className="dark:text-white/50 text-gray-600 opacity-0 text-lg"
+              className="dark:text-white/50 text-gray-600 opacity-0 text-md md:text-lg"
               style={{
                 filter: filter ? "blur(10px)" : "none",
               }}
@@ -60,7 +60,7 @@ export const TextGenerateEffect = ({
   return (
     <div className={cn("font-bold", className)}>
       <div className="mt-4">
-        <div className="dark:text-white text-black text-2xl leading-snug">
+        <div className="dark:text-white text-black text-lg md:text-2xl leading-snug">
           {renderWords()}
         </div>
       </div>

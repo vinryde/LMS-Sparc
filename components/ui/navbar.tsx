@@ -7,6 +7,7 @@ import { authClient } from "@/lib/auth-client";
 import { buttonVariants } from "@/components/ui/button";
 import UserDropdown from "@/app/(auth)/login/_components/UserDropdown";
 import { PublicMobileSidebar } from "@/components/ui/public-mobile-sidebar";
+import kug from "@/public/create_logo.png";
 
 const navItems = [
   {
@@ -30,8 +31,7 @@ export function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2 mr-4">
-        <Image src={ku} alt="CREATE" width={40} height={40} />  
-          <span className="font-bold">CREATE.</span>
+        <Image src={kug} alt="CREATE" width={70} height={70} />  
         </Link>
 
         {/* Desktop Navigation */}

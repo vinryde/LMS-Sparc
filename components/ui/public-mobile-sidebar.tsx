@@ -19,7 +19,8 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import Image from "next/image";
-import ku from "@/public/ku.png";
+import ku from "@/public/create_logo.png";
+import kug from "@/public/create_logo.png";
 import { authClient } from "@/lib/auth-client";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";

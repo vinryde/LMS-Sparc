@@ -56,7 +56,7 @@ export default function HeroSectionNew() {
 
       {/* Background Image with Gradient Mask */}
       <div 
-        className="absolute inset-0 z-0 bg-[url(/imagehero.jpg)] bg-cover bg-center opacity-70"
+        className="absolute inset-0 z-0 bg-[url(/newhero.jpg)] bg-cover bg-center opacity-70"
         style={{
           maskImage: "linear-gradient(180deg, transparent, black 0%, black 80%, transparent)",
           WebkitMaskImage: "linear-gradient(180deg, transparent, black 0%, black 80%, transparent)",
@@ -82,8 +82,8 @@ export default function HeroSectionNew() {
             <h1 
               className="animate-fade-in delay-200 text-4xl sm:text-4xl lg:text-6xl xl:text-6xl font-medium tracking-tighter leading-[1.1]"
               style={{
-                maskImage: "linear-gradient(180deg, black 0%, black 80%, transparent 100%)",
-                WebkitMaskImage: "linear-gradient(180deg, black 0%, black 80%, transparent 100%)"
+                maskImage: "linear-gradient(180deg, black 0%, black 100%, transparent 100%)",
+                WebkitMaskImage: "linear-gradient(180deg, black 0%, black 100%, transparent 100%)"
               }}
             >
               Climate Science Research,<br />

@@ -5,12 +5,6 @@ import Link from "next/link"
 
 import { useState, useEffect, useRef } from "react"
 import {
-  Pen,
-  PaintBucket,
-  Home,
-  Ruler,
-  PenTool,
-  Building2,
   Award,
   Users,
   Calendar,
@@ -25,10 +19,16 @@ import {
   Library,
   Lightbulb,
   MessageCircle,
+  CloudSun,
+  Binoculars,
+  FileSearch,
+  Atom,
+  Waypoints,
+  ThermometerSun,
 } from "lucide-react"
 import { motion, useScroll, useTransform, useInView, useSpring, type Variants } from "framer-motion"
 
-export default function AboutUsSection() {
+export default function AboutClimate() {
   const [isVisible, setIsVisible] = useState(false)
   const sectionRef = useRef<HTMLDivElement>(null)
   const statsRef = useRef<HTMLDivElement>(null)
@@ -72,51 +72,51 @@ export default function AboutUsSection() {
 
   const services = [
   {
-    icon: <Zap className="w-6 h-6" />,
+    icon: <CloudSun className="w-6 h-6" />,
     secondaryIcon: <Sparkles className="w-4 h-4 absolute -top-1 -right-1 text-[#A9BBC8]" />,
-    title: "Energy Literacy",
+    title: "Climate Foundations",
     description:
-      "Build foundational understanding of energy systems, sources, and impacts to support informed, responsible, and sustainable decision-making.",
+      "Develop a strong understanding of Earth’s climate system, atmospheric processes, and the scientific principles driving climate behavior.",
     position: "left",
   },
   {
-    icon: <MousePointerClick className="w-6 h-6" />,
+    icon: <Binoculars className="w-6 h-6" />,
     secondaryIcon: <CheckCircle className="w-4 h-4 absolute -top-1 -right-1 text-[#A9BBC8]" />,
-    title: "Interactive Learning",
+    title: "Interactive Exploration",
     description:
-      "Engage with quizzes, simulations, and assessments designed to strengthen comprehension through active participation and reflection.",
+      "Engage with climate models, simulations, and assessments that promote inquiry-based learning and scientific reasoning.",
     position: "left",
   },
   {
-    icon: <FileTerminal className="w-6 h-6" />,
+    icon: <FileSearch className="w-6 h-6" />,
     secondaryIcon: <Star className="w-4 h-4 absolute -top-1 -right-1 text-[#A9BBC8]" />,
-    title: "Activity-Based Modules",
+    title: "Investigation Modules",
     description:
-      "Hands-on learning activities replace passive instruction, helping learners apply energy concepts to real-world contexts.",
+      "Hands-on investigations help learners analyze climate data, observe patterns, and connect theory with real-world climate phenomena.",
     position: "left",
   },
   {
-    icon: <Library className="w-6 h-6" />,
+    icon: <Atom className="w-6 h-6" />,
     secondaryIcon: <Sparkles className="w-4 h-4 absolute -top-1 -right-1 text-[#A9BBC8]" />,
-    title: "Curated Resources",
+    title: "Scientific Resources",
     description:
-      "Access high-quality readings, visuals, and learning materials carefully selected to promote deep energy understanding.",
+      "Access curated datasets, readings, and visual resources selected to support accurate, evidence-based climate understanding.",
     position: "right",
   },
   {
-    icon: <Lightbulb className="w-6 h-6" />,
+    icon: <Waypoints className="w-6 h-6" />,
     secondaryIcon: <CheckCircle className="w-4 h-4 absolute -top-1 -right-1 text-[#A9BBC8]" />,
-    title: "Systems Thinking",
+    title: "Systems Perspective",
     description:
-      "Explore how energy connects with climate, environment, and society through integrated, systems-level perspectives.",
+      "Explore interactions between atmosphere, oceans, land, and life through systems thinking and integrated climate analysis.",
     position: "right",
   },
   {
     icon: <MessageCircle className="w-6 h-6" />,
     secondaryIcon: <Star className="w-4 h-4 absolute -top-1 -right-1 text-[#A9BBC8]" />,
-    title: "Guided Feedback",
+    title: "Reflective Feedback",
     description:
-      "Participate in structured feedback sessions that reinforce learning, encourage reflection, and deepen conceptual understanding.",
+      "Guided feedback sessions encourage reflection, strengthen understanding, and support deeper engagement with climate science concepts.",
     position: "right",
   },
 ];
@@ -136,7 +136,7 @@ export default function AboutUsSection() {
     >
       {/* Decorative background elements */}
       <motion.div
-        className="absolute top-20 left-10 w-64 h-64 rounded-full bg-[#4aa3b5]/5 blur-3xl"
+        className="absolute top-20 left-10 w-64 h-64 rounded-full bg-[#5da871]/5 blur-3xl"
         style={{ y: y1, rotate: rotate1 }}
       />
       <motion.div
@@ -144,7 +144,7 @@ export default function AboutUsSection() {
         style={{ y: y2, rotate: rotate2 }}
       />
       <motion.div
-        className="absolute top-1/2 left-1/4 w-4 h-4 rounded-full bg-[#4aa3b5]/30"
+        className="absolute top-1/2 left-1/4 w-4 h-4 rounded-full bg-[#5da871]/30"
         animate={{
           y: [0, -15, 0],
           opacity: [0.5, 1, 0.5],
@@ -177,17 +177,17 @@ export default function AboutUsSection() {
       >
         <motion.div className="flex flex-col items-center mb-6" variants={itemVariants}>
           <motion.span
-            className="text-[#4aa3b5] font-medium mb-2 flex items-center gap-2"
+            className="text-[#5da871] font-medium mb-2 flex items-center gap-2"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <Zap className="w-4 h-4" />
-            Energy for Futures
+            <ThermometerSun className="w-4 h-4" />
+           Climate Knowledge Matters
           </motion.span>
-          <h2 className="text-4xl md:text-5xl font-light mb-4 text-center">Energy Education</h2>
+          <h2 className="text-4xl md:text-5xl font-normal mb-4 text-center">Climate Science</h2>
           <motion.div
-            className="w-24 h-1 bg-[#4aa3b5]"
+            className="w-24 h-1 bg-[#5da871]"
             initial={{ width: 0 }}
             animate={{ width: 96 }}
             transition={{ duration: 1, delay: 0.5 }}
@@ -195,7 +195,7 @@ export default function AboutUsSection() {
         </motion.div>
 
         <motion.p className="text-center max-w-2xl mx-auto mb-16 text-muted-foreground" variants={itemVariants}>
-         The Energy Education course introduces learners to energy systems, sustainability principles, and responsible consumption. Through interactive, activity-based modules and expert-designed resources, the course builds strong energy literacy and empowers informed decisions that support climate action and a sustainable future.
+         The Climate Science course introduces learners to Earth’s climate systems, human influences, and global impacts. Through data-driven exploration, interactive investigations, and real-world contexts, the course builds climate literacy and empowers informed action toward resilience and sustainability.
         </motion.p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
@@ -228,7 +228,7 @@ export default function AboutUsSection() {
                 whileHover={{ scale: 1.03, transition: { duration: 0.3 } }}
               >
                 <img
-                  src="/Energy_edu.png"
+                  src="/Climate_imge.png"
                   alt="Modern House"
                   className="w-full h-full object-cover"
                 />
@@ -238,7 +238,7 @@ export default function AboutUsSection() {
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.9 }}
                 >
-                  <Link href="/courses/Energy-Education">
+                  <Link href="/courses/Climate-science">
                   <motion.button
                     className="bg-white/10 backdrop-blur-2xl text-white px-4 py-2 rounded-full flex items-center gap-2 text-sm font-medium"
                     whileHover={{ scale: 1.05 }}
@@ -258,7 +258,7 @@ export default function AboutUsSection() {
 
               {/* Floating accent elements */}
               <motion.div
-                className="absolute -top-4 -right-8 w-16 h-16 rounded-full bg-[#4aa3b5]/10"
+                className="absolute -top-4 -right-8 w-16 h-16 rounded-full bg-[#5da871]/10"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.9 }}
@@ -274,7 +274,7 @@ export default function AboutUsSection() {
 
               {/* Additional decorative elements */}
               <motion.div
-                className="absolute -top-10 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#4aa3b5]"
+                className="absolute -top-10 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#5da871]"
                 animate={{
                   y: [0, -10, 0],
                   opacity: [0.5, 1, 0.5],
@@ -352,7 +352,7 @@ export default function AboutUsSection() {
             <p className="text-white/80">Let's create something beautiful together.</p>
           </div>
           <motion.button
-            className="bg-[#88734C] hover:bg-[#88734C]/90 text-white px-6 py-3 rounded-lg flex items-center gap-2 font-medium transition-colors"
+            className="bg-[#5da871] hover:bg-[#5da871]/90 text-white px-6 py-3 rounded-lg flex items-center gap-2 font-medium transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -389,13 +389,13 @@ function ServiceItem({ icon, secondaryIcon, title, description, variants, delay,
         transition={{ duration: 0.6, delay: delay + 0.2 }}
       >
         <motion.div
-          className="text-[#4aa3b5] bg-[#4aa3b5]/10 p-3 rounded-lg transition-colors duration-300 group-hover:bg-[#4aa3b5]/20 relative"
+          className="text-[#5da871] bg-[#5da871]/10 p-3 rounded-lg transition-colors duration-300 group-hover:bg-[#5da871]/20 relative"
           whileHover={{ rotate: [0, -10, 10, -5, 0], transition: { duration: 0.5 } }}
         >
           {icon}
           {secondaryIcon}
         </motion.div>
-        <h3 className="text-xl font-medium text-foreground group-hover:text-[#4aa3b5] transition-colors duration-300">
+        <h3 className="text-xl font-medium text-foreground group-hover:text-[#5da871] transition-colors duration-300">
           {title}
         </h3>
       </motion.div>
@@ -408,7 +408,7 @@ function ServiceItem({ icon, secondaryIcon, title, description, variants, delay,
         {description}
       </motion.p>
       <motion.div
-        className="mt-3 pl-12 flex items-center text-[#4aa3b5] text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        className="mt-3 pl-12 flex items-center text-[#5da871] text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         initial={{ opacity: 0 }}
         animate={{ opacity: 0 }}
       >
@@ -464,7 +464,7 @@ function StatCounter({ icon, value, label, suffix, delay }: StatCounterProps) {
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
     >
       <motion.div
-        className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-[#4aa3b5] group-hover:bg-[#4aa3b5]/20 transition-colors duration-300"
+        className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-[#5da871] group-hover:bg-[#5da871]/20 transition-colors duration-300"
         whileHover={{ rotate: 360, transition: { duration: 0.8 } }}
       >
         {icon}
@@ -474,7 +474,7 @@ function StatCounter({ icon, value, label, suffix, delay }: StatCounterProps) {
         <span>{suffix}</span>
       </motion.div>
       <p className="text-muted-foreground text-sm mt-1">{label}</p>
-      <motion.div className="w-10 h-0.5 bg-[#4aa3b5] mt-3 group-hover:w-16 transition-all duration-300" />
+      <motion.div className="w-10 h-0.5 bg-[#5da871] mt-3 group-hover:w-16 transition-all duration-300" />
     </motion.div>
   )
 }
