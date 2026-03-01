@@ -13,7 +13,9 @@ import {
 const CLIENTS = [
   { name: "ku", logo: "/ku.png" },
   { name: "Sparc", logo: "/sparc.png" },
-  { name: "Command+Z", logo: "/southampton.png" },
+  { name: "Southampton University", logo: "/southampton.png" },
+  { name: "mahatma gandhi university", logo: "/mgu.png" },
+  { name: "Clarkson university", logo: "/clarkson.png" },
 ];
 
 // --- SUB-COMPONENTS ---

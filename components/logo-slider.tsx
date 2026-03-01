@@ -33,7 +33,6 @@ const logos = [
   { src: "/ku.png", alt: "Kerala university-1" },
   { src: "/sparc.png", alt: "Sparc Logo-1" },
   { src: "/southampton.png", alt: "Southampton University Logo-1" },
-  { src: "/ku.png", alt: "Kerala university-2" },
-  { src: "/sparc.png", alt: "Sparc Logo-2" },
-  { src: "/southampton.png", alt: "Southampton University Logo-2" },
+  { src: "/mgu.png", alt: "mahatma gandhi university" },
+  { src: "/clarkson.png", alt: "Clarkson university" },
 ];

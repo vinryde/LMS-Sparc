@@ -185,7 +185,7 @@ export default function AboutUsSection() {
             <Zap className="w-4 h-4" />
             Energy for Futures
           </motion.span>
-          <h2 className="text-4xl md:text-5xl font-light mb-4 text-center">Energy Education</h2>
+          <h2 className="text-4xl md:text-5xl font-light mb-4 text-center">Energy Literacy Essentials for Educators</h2>
           <motion.div
             className="w-24 h-1 bg-[#4aa3b5]"
             initial={{ width: 0 }}
@@ -195,7 +195,7 @@ export default function AboutUsSection() {
         </motion.div>
 
         <motion.p className="text-center max-w-2xl mx-auto mb-16 text-muted-foreground" variants={itemVariants}>
-         The Energy Education course introduces learners to energy systems, sustainability principles, and responsible consumption. Through interactive, activity-based modules and expert-designed resources, the course builds strong energy literacy and empowers informed decisions that support climate action and a sustainable future.
+         The Energy Literacy course introduces learners to energy systems, sustainability principles, and responsible consumption. Through interactive, activity-based modules and expert-designed resources, the course builds strong energy literacy and empowers informed decisions that support climate action and a sustainable future.
         </motion.p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">

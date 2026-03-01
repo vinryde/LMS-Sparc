@@ -185,7 +185,7 @@ export default function AboutClimate() {
             <ThermometerSun className="w-4 h-4" />
            Climate Knowledge Matters
           </motion.span>
-          <h2 className="text-4xl md:text-5xl font-normal mb-4 text-center">Climate Science</h2>
+          <h2 className="text-4xl md:text-5xl font-normal mb-4 text-center">Climate Literacy Essentials for Educators</h2>
           <motion.div
             className="w-24 h-1 bg-[#5da871]"
             initial={{ width: 0 }}
@@ -195,7 +195,7 @@ export default function AboutClimate() {
         </motion.div>
 
         <motion.p className="text-center max-w-2xl mx-auto mb-16 text-muted-foreground" variants={itemVariants}>
-         The Climate Science course introduces learners to Earth’s climate systems, human influences, and global impacts. Through data-driven exploration, interactive investigations, and real-world contexts, the course builds climate literacy and empowers informed action toward resilience and sustainability.
+         The Climate Literacy course introduces learners to Earth’s climate systems, human influences, and global impacts. Through data-driven exploration, interactive investigations, and real-world contexts, the course builds climate literacy and empowers informed action toward resilience and sustainability.
         </motion.p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
