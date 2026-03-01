@@ -79,7 +79,7 @@ export const Footer: FC<FooterProps> = ({
         {/* Company Info */}
         <div className="flex flex-col items-start ">
           <div className="flex items-start gap-3">
-            <img src={logoSrc} alt={`${companyName} Logo`} className="h-40 w-40 rounded-full" />
+            <img src={logoSrc} alt={`${companyName} Logo`} className="h-40 w-40 rounded-full ml-[-15px]" />
           </div>
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
