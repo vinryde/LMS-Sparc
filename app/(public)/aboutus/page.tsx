@@ -8,9 +8,15 @@ import {
   Globe2,
   BookOpenCheck,
 } from "lucide-react";
+import EthicalHeroDemo from "@/components/abouthero";
+import { DemoAbout } from "@/components/abousecabout";
 
 export default function AboutPage() {
   return (
+    <div>
+      <EthicalHeroDemo />
+      <div className="px-4 md:px-0">
+      <DemoAbout />
     <div className="py-16 md:py-24">
       <div className="mx-auto w-full space-y-16">
         {/* Hero: Intro + Mission & Vision */}
@@ -216,52 +222,10 @@ export default function AboutPage() {
         </section>
 
         {/* How learning works */}
-        <section className="space-y-6">
-          <div className="max-w-3xl space-y-3">
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-              How learning works on CREATE
-            </h2>
-            <p className="text-muted-foreground text-sm md:text-base">
-              Each course combines core content with activities, interactive
-              assessments, and reflection to make learning concrete and
-              meaningful.
-            </p>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Structured modules</CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
-                Lessons are organized into short, focused modules that you can
-                complete at your own pace, with clear learning outcomes and
-                supporting resources.
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Interactive activities</CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
-                Activities, resources, and interactive elements help learners
-                apply ideas to real-world scenarios and local contexts.
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Reflection & assessment</CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm text-muted-foreground">
-                Quizzes, feedback prompts, and reflection questions support
-                deeper understanding and help track learning over time.
-              </CardContent>
-            </Card>
-          </div>
-        </section>
+        
       </div>
+    </div>
+    </div>
     </div>
   );
 }

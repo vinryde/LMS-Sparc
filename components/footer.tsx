@@ -36,6 +36,7 @@ export const Footer: FC<FooterProps> = ({
     { label: 'Home', href: '/' },
     { label: 'Courses', href: '/courses' },
     { label: 'Dashboard', href: '/dashboard' },
+    { label: 'About Us', href: '/aboutus' },
     { label: 'Login', href: '/login' },
     { label: 'Privacy Policy', href: '#' },
   ],
