@@ -48,10 +48,6 @@ export default async function SlugPage({params}: {params: Params}) {
                     <IconCategory className="size-4" />
                     <span>{course.category}</span>
                    </Badge>
-                   <Badge className="fle items-center gap-1 px-3 py-1">
-                    <IconClock className="size-4" />
-                    <span>{course.duration}hours</span>
-                   </Badge>
                 </div>
                 <Separator className="my-8"/>
 
@@ -67,10 +63,10 @@ export default async function SlugPage({params}: {params: Params}) {
                     <div className="flex items-center justify-between">
                         <h2 className="text-3xl font-semibold tracking-tight">Course Content</h2>
                         <div>
-                            {course.chapter.length} Chapters | {course.chapter.reduce(
+                            {course.chapter.length} Modules | {course.chapter.reduce(
                                 (total,chapter) => total + chapter.lesson.length,
                                 0
-                            ) || 0} {" "} Lessons
+                            ) || 0} {" "} Capsules
                         </div>
 
                     </div>
@@ -88,13 +84,13 @@ export default async function SlugPage({params}: {params: Params}) {
                                                     <div>
                                                         <h3 className="text-xl font-semibold text-left">{chapter.title}</h3>
                                                         <p className="text-sm text-muted-foreground mt-1 text-left">
-                                                            {chapter.lesson.length} Lesson
+                                                            {chapter.lesson.length} Capsule
                                                             {chapter.lesson.length !==1 ? "s" : ""}
                                                         </p>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-3">
-                                                    <Badge variant="outline" className="text-xs"> {chapter.lesson.length} Lesson
+                                                    <Badge variant="outline" className="text-xs"> {chapter.lesson.length} Capsule
                                                             {chapter.lesson.length !==1 ? "s" : ""}</Badge>
 
                                                             <IconChevronDown className="size-5 text-muted-foreground" />
@@ -113,7 +109,7 @@ export default async function SlugPage({params}: {params: Params}) {
                                                  <div className="flex-1">
                                                     <p className="font-medium text-sm">{lesson.title}</p>
                                                     <p className="text-xs text-muted-foreground mt-1">
-                                                        Lesson {lessonIndex + 1}
+                                                        Capsule {lessonIndex + 1}
                                                     </p>
 
                                                  </div>
@@ -144,19 +140,7 @@ export default async function SlugPage({params}: {params: Params}) {
                             <div className="space-y-3 mb-6 rounded-lg bg-muted p-4">
                                 
                                 <div className="flex flex-col gap-3">
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                                            <IconClock className="size-4" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-medium">
-                                                Course Duration
-                                            </p>
-                                            <p className="text-sm text-muted-foreground">
-                                                {course.duration} hours
-                                            </p>
-                                        </div>
-                                    </div>
+                                    
                                    
                                    
 
@@ -180,13 +164,13 @@ export default async function SlugPage({params}: {params: Params}) {
                                         </div>
                                         <div>
                                             <p className="text-sm font-medium">
-                                                Total Lessons
+                                                Total Capsules
                                             </p>
                                             <p className="text-sm text-muted-foreground">
                                                 {course.chapter.reduce(
                                            (total,chapter) => total + chapter.lesson.length,
                                  0
-                            ) || 0} {" "} Lessons
+                            ) || 0} {" "} Capsules
                                             </p>
                                         </div>
                                     </div>
