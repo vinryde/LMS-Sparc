@@ -34,9 +34,9 @@ export const Footer: FC<FooterProps> = ({
   description = 'CREATE empowers climate and energy education through research-driven learning, collaboration, and sustainable action for resilient global communities.',
   usefulLinks = [
     { label: 'Home', href: '/' },
+    { label: 'About Us', href: '/aboutus' },
     { label: 'Courses', href: '/courses' },
     { label: 'Dashboard', href: '/dashboard' },
-    { label: 'About Us', href: '/aboutus' },
     { label: 'Login', href: '/login' },
     { label: 'Privacy Policy', href: '#' },
   ],
