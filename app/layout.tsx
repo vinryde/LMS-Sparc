@@ -17,8 +17,13 @@ const bricolageGrotesque = Bricolage_Grotesque({
 
 
 export const metadata: Metadata = {
-title: "CREATE: Climate & Energy Education",
-description: "Empowering learners with climate science knowledge and energy literacy to build sustainable, resilient futures.",
+  title: "CREATE: Climate & Energy Education",
+  description: "Empowering learners with climate science knowledge and energy literacy to build sustainable, resilient futures.",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
