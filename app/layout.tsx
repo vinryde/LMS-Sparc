@@ -18,7 +18,7 @@ const bricolageGrotesque = Bricolage_Grotesque({
 
 export const metadata: Metadata = {
   title: "CREATE: Climate & Energy Education",
-  description: "Empowering learners with climate science knowledge and energy literacy to build sustainable, resilient futures.",
+  description: "Empowering learners with climate science knowledge and energy literacy to build sustainable, resilient futures. Createsparc is a platform that provides climate science education and energy literacy resources to learners around the world.",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
