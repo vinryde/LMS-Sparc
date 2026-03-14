@@ -12,8 +12,8 @@ function getPool() {
   if (!pool) {
     pool = new Pool({
       connectionString,
-      max: 1, // Limit to 1 connection per serverless function
-      idleTimeoutMillis: 10000, // Close idle connections after 10s
+      max: 10, // Increased to 10 for better concurrency
+      idleTimeoutMillis: 30000, // Close idle connections after 30s
       connectionTimeoutMillis: 5000, // Timeout after 5s
     });
 
